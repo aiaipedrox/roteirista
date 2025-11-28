@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Channel Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🎬 Dark Channel Manager</h1>
+            <div class="header-stats">
+                <span id="channelCount">0 canais</span>
+                <span id="videoCount">0 vídeos</span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="channels">📺 Canais</button>
+            <button class="tab-btn" data-tab="videos">🎥 Vídeos</button>
+            <button class="tab-btn" data-tab="converter">📝 SRT</button>
+        </nav>
+
+        <!-- Canais Tab -->
+        <div id="channels-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Meus Canais</h2>
+                <button class="btn btn-primary" id="addChannelBtn">+ Adicionar Canal</button>
+            </div>
+
+            <div id="channelsList" class="channels-list"></div>
+
+            <!-- Add Channel Modal -->
+            <div id="channelModal" class="modal">
+                <div class="modal-content">
+                    <h3>Adicionar Canal</h3>
+                    <input type="text" id="channelName" placeholder="Nome do canal" class="input-field">
+                    <textarea id="channelDescription" placeholder="Descrição (opcional)" class="input-field"></textarea>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="cancelChannelBtn">Cancelar</button>
+                        <button class="btn btn-primary" id="saveChannelBtn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vídeos Tab -->
+        <div id="videos-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Gerenciar Vídeos</h2>
+                <button class="btn btn-primary" id="addVideoBtn">+ Novo Vídeo</button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters">
+                <select id="channelFilter" class="input-field">
+                    <option value="">Todos os canais</option>
+                </select>
+                <select id="stageFilter" class="input-field">
+                    <option value="">Todos os estágios</option>
+                    <option value="planejamento">📋 Planejamento</option>
+                    <option value="producao">🎬 Produção</option>
+                    <option value="finalizado">✅ Finalizado</option>
+                    <option value="postado">🚀 Postado</option>
+                </select>
+            </div>
+
+            <div id="videosList" class="videos-list"></div>
+
+            <!-- Add/Edit Video Modal -->
+            <div id="videoModal" class="modal">
+                <div class="modal-content modal-large">
+                    <h3 id="videoModalTitle">Novo Vídeo</h3>
+
+                    <select id="videoChannel" class="input-field" required>
+                        <option value="">Selecione o canal</option>
+                    </select>
+
+                    <input type="text" id="videoTitle" placeholder="Título do vídeo" class="input-field" required>
+
+                    <textarea id="videoDescription" placeholder="Descrição do vídeo" class="input-field" rows="4"></textarea>
+
+                    <input type="text" id="videoThumbText" placeholder="Texto da thumbnail" class="input-field">
+
+                    <div class="file-upload">
+                        <label for="videoThumbFile" class="btn btn-secondary">📷 Upload Thumbnail</label>
+                        <input type="file" id="videoThumbFile" accept="image/*" style="display: none;">
+                        <span id="thumbFileName"></span>
+                    </div>
+
+                    <div id="thumbPreview" class="thumb-preview"></div>
+
+                    <textarea id="videoScript" placeholder="Roteiro do vídeo" class="input-field" rows="6"></textarea>
+
+                    <div class="checklist">
+                        <h4>Checklist de Produção:</h4>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="checkThumb">
+                            <span>📷 Thumbnail</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="checkScript">
+                            <span>📝 Roteiro</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="checkEdit">
+                            <span>✂️ Edição</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="checkUpload">
+                            <span>☁️ Upload</span>
+                        </label>
+                    </div>
+
+                    <div class="stage-display">
+                        <span>Estágio: </span>
+                        <span id="currentStage" class="stage-badge">📋 PLANEJAMENTO</span>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="cancelVideoBtn">Cancelar</button>
+                        <button class="btn btn-danger" id="deleteVideoBtn" style="display: none;">🗑️ Excluir</button>
+                        <button class="btn btn-primary" id="saveVideoBtn">💾 Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SRT Converter Tab -->
+        <div id="converter-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Conversor de Texto para SRT</h2>
+            </div>
+
+            <div class="converter-container">
+                <div class="converter-settings">
+                    <label>
+                        Palavras por legenda:
+                        <input type="number" id="wordsPerSubtitle" value="10" min="1" max="30" class="input-field">
+                    </label>
+                    <label>
+                        Duração por legenda (segundos):
+                        <input type="number" id="durationPerSubtitle" value="3" min="1" max="10" step="0.5" class="input-field">
+                    </label>
+                </div>
+
+                <textarea id="textInput" placeholder="Cole seu texto aqui..." class="input-field converter-input" rows="15"></textarea>
+
+                <div class="converter-stats">
+                    <span>Palavras: <strong id="wordCount">0</strong></span>
+                    <span>Caracteres: <strong id="charCount">0</strong></span>
+                    <span>Legendas: <strong id="subtitleCount">0</strong></span>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="convertBtn">🔄 Converter para SRT</button>
+
+                <textarea id="srtOutput" placeholder="Saída em formato SRT aparecerá aqui..." class="input-field converter-output" rows="15" readonly></textarea>
+
+                <button class="btn btn-success btn-full" id="downloadSrtBtn" style="display: none;">⬇️ Download SRT</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
