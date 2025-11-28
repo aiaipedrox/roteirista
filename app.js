@@ -1,56 +1,20 @@
-// Dark Channel Manager - Main Application
-// Data Storage
+// ============================================
+// DARK CHANNEL MANAGER - FUTURISTIC VERSION
+// ============================================
+
+// Data Manager - LocalStorage
 class DataManager {
     constructor() {
-        this.channels = this.loadChannels();
         this.videos = this.loadVideos();
     }
 
-    loadChannels() {
-        const data = localStorage.getItem('channels');
-        return data ? JSON.parse(data) : [];
-    }
-
-    saveChannels() {
-        localStorage.setItem('channels', JSON.stringify(this.channels));
-    }
-
     loadVideos() {
-        const data = localStorage.getItem('videos');
+        const data = localStorage.getItem('darkChannelVideos');
         return data ? JSON.parse(data) : [];
     }
 
     saveVideos() {
-        localStorage.setItem('videos', JSON.stringify(this.videos));
-    }
-
-    addChannel(channel) {
-        channel.id = Date.now().toString();
-        channel.createdAt = new Date().toISOString();
-        this.channels.push(channel);
-        this.saveChannels();
-        return channel;
-    }
-
-    updateChannel(id, updates) {
-        const index = this.channels.findIndex(c => c.id === id);
-        if (index !== -1) {
-            this.channels[index] = { ...this.channels[index], ...updates };
-            this.saveChannels();
-            return this.channels[index];
-        }
-        return null;
-    }
-
-    deleteChannel(id) {
-        this.channels = this.channels.filter(c => c.id !== id);
-        this.videos = this.videos.filter(v => v.channelId !== id);
-        this.saveChannels();
-        this.saveVideos();
-    }
-
-    getChannel(id) {
-        return this.channels.find(c => c.id === id);
+        localStorage.setItem('darkChannelVideos', JSON.stringify(this.videos));
     }
 
     addVideo(video) {
@@ -82,10 +46,7 @@ class DataManager {
         return this.videos.find(v => v.id === id);
     }
 
-    getVideosByChannel(channelId) {
-        return this.videos.filter(v => v.channelId === channelId);
-    }
-
+    // Calcula o estágio automaticamente baseado no checklist
     calculateStage(video) {
         const checks = video.checklist || {};
         const completedCount = Object.values(checks).filter(Boolean).length;
@@ -102,13 +63,18 @@ class DataManager {
         const completed = Object.values(checks).filter(Boolean).length;
         return Math.round((completed / total) * 100);
     }
+
+    getUniqueChannels() {
+        const channels = [...new Set(this.videos.map(v => v.channel))];
+        return channels.filter(c => c && c.trim() !== '').sort();
+    }
 }
 
 // UI Manager
 class UIManager {
     constructor(dataManager) {
         this.dataManager = dataManager;
-        this.currentTab = 'channels';
+        this.currentTab = 'videos';
         this.currentVideoId = null;
         this.thumbImageData = null;
         this.initializeEventListeners();
@@ -121,18 +87,13 @@ class UIManager {
             btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
         });
 
-        // Channel Management
-        document.getElementById('addChannelBtn').addEventListener('click', () => this.openChannelModal());
-        document.getElementById('cancelChannelBtn').addEventListener('click', () => this.closeChannelModal());
-        document.getElementById('saveChannelBtn').addEventListener('click', () => this.saveChannel());
-
         // Video Management
         document.getElementById('addVideoBtn').addEventListener('click', () => this.openVideoModal());
         document.getElementById('cancelVideoBtn').addEventListener('click', () => this.closeVideoModal());
         document.getElementById('saveVideoBtn').addEventListener('click', () => this.saveVideo());
         document.getElementById('deleteVideoBtn').addEventListener('click', () => this.deleteVideo());
 
-        // Video checklist
+        // Video checklist - update stage preview in real-time
         ['checkThumb', 'checkScript', 'checkEdit', 'checkUpload'].forEach(id => {
             document.getElementById(id).addEventListener('change', () => this.updateStagePreview());
         });
@@ -178,126 +139,20 @@ class UIManager {
     render() {
         this.updateStats();
 
-        if (this.currentTab === 'channels') {
-            this.renderChannels();
-        } else if (this.currentTab === 'videos') {
+        if (this.currentTab === 'videos') {
             this.renderVideos();
-            this.updateFilters();
+            this.updateChannelFilter();
         }
     }
 
     updateStats() {
-        document.getElementById('channelCount').textContent =
-            `${this.dataManager.channels.length} ${this.dataManager.channels.length === 1 ? 'canal' : 'canais'}`;
+        const videoCount = this.dataManager.videos.length;
+        const channelCount = this.dataManager.getUniqueChannels().length;
+
         document.getElementById('videoCount').textContent =
-            `${this.dataManager.videos.length} ${this.dataManager.videos.length === 1 ? 'vídeo' : 'vídeos'}`;
-    }
-
-    // Channel Management
-    renderChannels() {
-        const container = document.getElementById('channelsList');
-
-        if (this.dataManager.channels.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📺</div>
-                    <h3>Nenhum canal cadastrado</h3>
-                    <p>Adicione seu primeiro canal para começar!</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = this.dataManager.channels.map(channel => {
-            const videoCount = this.dataManager.getVideosByChannel(channel.id).length;
-            return `
-                <div class="channel-card" data-id="${channel.id}">
-                    <h3>📺 ${this.escapeHtml(channel.name)}</h3>
-                    <p>${this.escapeHtml(channel.description || 'Sem descrição')}</p>
-                    <div class="channel-stats">
-                        <span>📹 ${videoCount} ${videoCount === 1 ? 'vídeo' : 'vídeos'}</span>
-                    </div>
-                    <div class="channel-actions">
-                        <button class="btn btn-secondary btn-edit-channel">✏️ Editar</button>
-                        <button class="btn btn-danger btn-delete-channel">🗑️ Excluir</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        // Add event listeners
-        container.querySelectorAll('.channel-card').forEach(card => {
-            const id = card.dataset.id;
-            card.querySelector('.btn-edit-channel').addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openChannelModal(id);
-            });
-            card.querySelector('.btn-delete-channel').addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.deleteChannel(id);
-            });
-        });
-    }
-
-    openChannelModal(channelId = null) {
-        const modal = document.getElementById('channelModal');
-
-        if (channelId) {
-            const channel = this.dataManager.getChannel(channelId);
-            document.getElementById('channelName').value = channel.name;
-            document.getElementById('channelDescription').value = channel.description || '';
-            modal.dataset.editId = channelId;
-        } else {
-            document.getElementById('channelName').value = '';
-            document.getElementById('channelDescription').value = '';
-            delete modal.dataset.editId;
-        }
-
-        modal.classList.add('active');
-    }
-
-    closeChannelModal() {
-        document.getElementById('channelModal').classList.remove('active');
-    }
-
-    saveChannel() {
-        const name = document.getElementById('channelName').value.trim();
-
-        if (!name) {
-            alert('Por favor, insira o nome do canal');
-            return;
-        }
-
-        const channelData = {
-            name,
-            description: document.getElementById('channelDescription').value.trim()
-        };
-
-        const modal = document.getElementById('channelModal');
-        const editId = modal.dataset.editId;
-
-        if (editId) {
-            this.dataManager.updateChannel(editId, channelData);
-        } else {
-            this.dataManager.addChannel(channelData);
-        }
-
-        this.closeChannelModal();
-        this.render();
-    }
-
-    deleteChannel(id) {
-        const channel = this.dataManager.getChannel(id);
-        const videoCount = this.dataManager.getVideosByChannel(id).length;
-
-        const message = videoCount > 0
-            ? `Tem certeza que deseja excluir o canal "${channel.name}"?\nIsso irá excluir também ${videoCount} ${videoCount === 1 ? 'vídeo' : 'vídeos'}.`
-            : `Tem certeza que deseja excluir o canal "${channel.name}"?`;
-
-        if (confirm(message)) {
-            this.dataManager.deleteChannel(id);
-            this.render();
-        }
+            `${videoCount} ${videoCount === 1 ? 'vídeo' : 'vídeos'}`;
+        document.getElementById('channelCount').textContent =
+            `${channelCount} ${channelCount === 1 ? 'canal' : 'canais'}`;
     }
 
     // Video Management
@@ -310,7 +165,7 @@ class UIManager {
         const stageFilter = document.getElementById('stageFilter').value;
 
         if (channelFilter) {
-            videos = videos.filter(v => v.channelId === channelFilter);
+            videos = videos.filter(v => v.channel === channelFilter);
         }
 
         if (stageFilter) {
@@ -320,9 +175,9 @@ class UIManager {
         if (videos.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">🎥</div>
+                    <div class="empty-state-icon">🎬</div>
                     <h3>Nenhum vídeo encontrado</h3>
-                    <p>Adicione seu primeiro vídeo para começar!</p>
+                    <p>Clique em "CRIAR VÍDEO" para começar sua produção!</p>
                 </div>
             `;
             return;
@@ -332,7 +187,6 @@ class UIManager {
         videos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         container.innerHTML = videos.map(video => {
-            const channel = this.dataManager.getChannel(video.channelId);
             const progress = this.dataManager.getProgress(video);
             const checklist = video.checklist || {};
 
@@ -341,7 +195,7 @@ class UIManager {
                     <div class="video-header">
                         <div class="video-title">
                             <h3>${this.escapeHtml(video.title)}</h3>
-                            <div class="video-channel">📺 ${channel ? this.escapeHtml(channel.name) : 'Canal removido'}</div>
+                            <div class="video-channel">📺 ${this.escapeHtml(video.channel)}</div>
                         </div>
                         <span class="stage-badge stage-${video.stage}">${this.getStageBadge(video.stage)}</span>
                     </div>
@@ -354,16 +208,16 @@ class UIManager {
 
                     <div class="video-checklist">
                         <span class="check-item ${checklist.thumb ? 'completed' : ''}">
-                            ${checklist.thumb ? '✅' : '⬜'} Thumbnail
+                            ${checklist.thumb ? '✅' : '⬜'} THUMBNAIL
                         </span>
                         <span class="check-item ${checklist.script ? 'completed' : ''}">
-                            ${checklist.script ? '✅' : '⬜'} Roteiro
+                            ${checklist.script ? '✅' : '⬜'} ROTEIRO
                         </span>
                         <span class="check-item ${checklist.edit ? 'completed' : ''}">
-                            ${checklist.edit ? '✅' : '⬜'} Edição
+                            ${checklist.edit ? '✅' : '⬜'} EDIÇÃO
                         </span>
                         <span class="check-item ${checklist.upload ? 'completed' : ''}">
-                            ${checklist.upload ? '✅' : '⬜'} Upload
+                            ${checklist.upload ? '✅' : '⬜'} UPLOAD
                         </span>
                     </div>
                 </div>
@@ -378,16 +232,15 @@ class UIManager {
         });
     }
 
-    updateFilters() {
+    updateChannelFilter() {
         const channelFilter = document.getElementById('channelFilter');
-        const videoChannel = document.getElementById('videoChannel');
+        const channels = this.dataManager.getUniqueChannels();
 
-        const options = this.dataManager.channels.map(channel =>
-            `<option value="${channel.id}">${this.escapeHtml(channel.name)}</option>`
+        const options = channels.map(channel =>
+            `<option value="${this.escapeHtml(channel)}">${this.escapeHtml(channel)}</option>`
         ).join('');
 
-        channelFilter.innerHTML = '<option value="">Todos os canais</option>' + options;
-        videoChannel.innerHTML = '<option value="">Selecione o canal</option>' + options;
+        channelFilter.innerHTML = '<option value="">📺 TODOS OS CANAIS</option>' + options;
     }
 
     openVideoModal(videoId = null) {
@@ -395,15 +248,13 @@ class UIManager {
         const title = document.getElementById('videoModalTitle');
         const deleteBtn = document.getElementById('deleteVideoBtn');
 
-        this.updateFilters();
-
         if (videoId) {
             const video = this.dataManager.getVideo(videoId);
             this.currentVideoId = videoId;
-            title.textContent = 'Editar Vídeo';
+            title.textContent = '✏️ EDITAR VÍDEO';
             deleteBtn.style.display = 'block';
 
-            document.getElementById('videoChannel').value = video.channelId;
+            document.getElementById('videoChannel').value = video.channel;
             document.getElementById('videoTitle').value = video.title;
             document.getElementById('videoDescription').value = video.description || '';
             document.getElementById('videoThumbText').value = video.thumbText || '';
@@ -423,7 +274,7 @@ class UIManager {
             }
         } else {
             this.currentVideoId = null;
-            title.textContent = 'Novo Vídeo';
+            title.textContent = '🎬 NOVO VÍDEO';
             deleteBtn.style.display = 'none';
 
             document.getElementById('videoChannel').value = '';
@@ -453,21 +304,21 @@ class UIManager {
     }
 
     saveVideo() {
-        const channelId = document.getElementById('videoChannel').value;
+        const channel = document.getElementById('videoChannel').value.trim();
         const title = document.getElementById('videoTitle').value.trim();
 
-        if (!channelId) {
-            alert('Por favor, selecione um canal');
+        if (!channel) {
+            this.showNotification('❌ Por favor, insira o nome do canal', 'danger');
             return;
         }
 
         if (!title) {
-            alert('Por favor, insira o título do vídeo');
+            this.showNotification('❌ Por favor, insira o título do vídeo', 'danger');
             return;
         }
 
         const videoData = {
-            channelId,
+            channel,
             title,
             description: document.getElementById('videoDescription').value.trim(),
             thumbText: document.getElementById('videoThumbText').value.trim(),
@@ -483,8 +334,10 @@ class UIManager {
 
         if (this.currentVideoId) {
             this.dataManager.updateVideo(this.currentVideoId, videoData);
+            this.showNotification('✅ Vídeo atualizado com sucesso!', 'success');
         } else {
             this.dataManager.addVideo(videoData);
+            this.showNotification('✅ Vídeo criado com sucesso!', 'success');
         }
 
         this.closeVideoModal();
@@ -492,8 +345,9 @@ class UIManager {
     }
 
     deleteVideo() {
-        if (confirm('Tem certeza que deseja excluir este vídeo?')) {
+        if (confirm('⚠️ Tem certeza que deseja excluir este vídeo?\n\nEsta ação não pode ser desfeita.')) {
             this.dataManager.deleteVideo(this.currentVideoId);
+            this.showNotification('🗑️ Vídeo excluído', 'success');
             this.closeVideoModal();
             this.render();
         }
@@ -518,7 +372,13 @@ class UIManager {
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
-            alert('Por favor, selecione uma imagem válida');
+            this.showNotification('❌ Por favor, selecione uma imagem válida', 'danger');
+            return;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            this.showNotification('❌ Imagem muito grande! Tamanho máximo: 5MB', 'danger');
             return;
         }
 
@@ -527,7 +387,8 @@ class UIManager {
             this.thumbImageData = e.target.result;
             document.getElementById('thumbPreview').innerHTML =
                 `<img src="${this.thumbImageData}" alt="Thumbnail preview">`;
-            document.getElementById('thumbFileName').textContent = file.name;
+            document.getElementById('thumbFileName').textContent = `✅ ${file.name}`;
+            this.showNotification('✅ Thumbnail carregada!', 'success');
         };
         reader.readAsDataURL(file);
     }
@@ -542,13 +403,13 @@ class UIManager {
         return badges[stage] || badges.planejamento;
     }
 
-    // SRT Converter
+    // SRT Converter - CapCut Compatible Format
     updateConverterStats() {
         const text = document.getElementById('textInput').value;
         const words = text.trim().split(/\s+/).filter(w => w.length > 0);
         const chars = text.length;
         const wordsPerSubtitle = parseInt(document.getElementById('wordsPerSubtitle').value) || 10;
-        const subtitles = Math.ceil(words.length / wordsPerSubtitle);
+        const subtitles = words.length > 0 ? Math.ceil(words.length / wordsPerSubtitle) : 0;
 
         document.getElementById('wordCount').textContent = words.length;
         document.getElementById('charCount').textContent = chars;
@@ -559,7 +420,7 @@ class UIManager {
         const text = document.getElementById('textInput').value.trim();
 
         if (!text) {
-            alert('Por favor, insira algum texto para converter');
+            this.showNotification('❌ Por favor, insira algum texto para converter', 'danger');
             return;
         }
 
@@ -575,8 +436,8 @@ class UIManager {
             const subtitleWords = words.slice(i, i + wordsPerSubtitle);
             const subtitleText = subtitleWords.join(' ');
 
-            const startTime = this.formatSRTTime(currentTime);
-            const endTime = this.formatSRTTime(currentTime + durationPerSubtitle);
+            const startTime = this.formatSRTTimeCapCut(currentTime);
+            const endTime = this.formatSRTTimeCapCut(currentTime + durationPerSubtitle);
 
             srtContent += `${subtitleNumber}\n`;
             srtContent += `${startTime} --> ${endTime}\n`;
@@ -587,14 +448,17 @@ class UIManager {
 
         document.getElementById('srtOutput').value = srtContent;
         document.getElementById('downloadSrtBtn').style.display = 'block';
+        this.showNotification('✅ Conversão concluída! Formato compatível com CapCut', 'success');
     }
 
-    formatSRTTime(seconds) {
+    // CapCut uses comma (,) as decimal separator, not dot (.)
+    formatSRTTimeCapCut(seconds) {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
         const millis = Math.floor((seconds % 1) * 1000);
 
+        // Format: HH:MM:SS,mmm (comma for milliseconds - CapCut standard)
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(millis).padStart(3, '0')}`;
     }
 
@@ -602,7 +466,7 @@ class UIManager {
         const content = document.getElementById('srtOutput').value;
 
         if (!content) {
-            alert('Nenhum conteúdo para baixar');
+            this.showNotification('❌ Nenhum conteúdo para baixar', 'danger');
             return;
         }
 
@@ -610,11 +474,43 @@ class UIManager {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `legendas-${Date.now()}.srt`;
+        a.download = `legendas-capcut-${Date.now()}.srt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        this.showNotification('✅ Arquivo .srt baixado com sucesso!', 'success');
+    }
+
+    // Notification System
+    showNotification(message, type = 'info') {
+        // Remove existing notifications
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: ${type === 'success' ? 'var(--success)' : type === 'danger' ? 'var(--danger)' : 'var(--neon-cyan)'};
+            color: var(--bg-dark);
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            z-index: 10000;
+            box-shadow: 0 0 30px ${type === 'success' ? 'rgba(0,255,136,0.6)' : type === 'danger' ? 'rgba(255,51,102,0.6)' : 'rgba(0,240,255,0.6)'};
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+        `;
+
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
     }
 
     escapeHtml(text) {
@@ -624,6 +520,27 @@ class UIManager {
     }
 }
 
+// Add notification animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
 // Initialize Application
 const dataManager = new DataManager();
 const uiManager = new UIManager(dataManager);
@@ -631,9 +548,9 @@ const uiManager = new UIManager(dataManager);
 // Export data functionality
 window.exportData = function() {
     const data = {
-        channels: dataManager.channels,
         videos: dataManager.videos,
-        exportDate: new Date().toISOString()
+        exportDate: new Date().toISOString(),
+        version: '2.0'
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -645,7 +562,30 @@ window.exportData = function() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    console.log('✅ Backup exportado com sucesso!');
 };
 
-console.log('🎬 Dark Channel Manager iniciado com sucesso!');
-console.log('💾 Use exportData() no console para fazer backup dos seus dados');
+// Import data functionality
+window.importData = function(jsonData) {
+    try {
+        const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+        if (data.videos && Array.isArray(data.videos)) {
+            dataManager.videos = data.videos;
+            dataManager.saveVideos();
+            uiManager.render();
+            console.log('✅ Dados importados com sucesso!');
+            return true;
+        }
+        console.error('❌ Formato de dados inválido');
+        return false;
+    } catch (e) {
+        console.error('❌ Erro ao importar dados:', e);
+        return false;
+    }
+};
+
+console.log('⚡ DARK CHANNEL MANAGER v2.0 - FUTURISTIC EDITION');
+console.log('💾 Use exportData() para backup dos dados');
+console.log('📥 Use importData(json) para restaurar backup');
+console.log('🎬 Sistema pronto para produção!');
