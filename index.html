@@ -58,7 +58,7 @@
                     <path d="M9 9a2 2 0 114 0 2 2 0 01-4 0z"/>
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-3.446 6.032l-2.261 2.26a1 1 0 101.414 1.415l2.261-2.261A4 4 0 1011 5z"/>
                 </svg>
-                <span>Radar de Títulos</span>
+                <span>Radar de Mercado</span>
             </a>
 
             <div class="nav-divider"></div>
@@ -210,8 +210,8 @@
         <div class="page" id="radar-page">
             <div class="page-header">
                 <div>
-                    <h1>Radar de Títulos Globais</h1>
-                    <p class="page-subtitle">Verifique a concorrência de títulos no YouTube</p>
+                    <h1>Radar de Mercado</h1>
+                    <p class="page-subtitle">Analise a concorrência de títulos no YouTube</p>
                 </div>
             </div>
 
@@ -222,9 +222,18 @@
                         <input type="text" id="radarTitlePT" class="input" placeholder="Ex: Como Ganhar Dinheiro Online em 2024">
                     </div>
 
-                    <div class="form-group">
-                        <label>Tradução Automática (EN)</label>
-                        <input type="text" id="radarTitleEN" class="input" placeholder="Tradução automática aparecerá aqui..." readonly>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Idioma de Busca</label>
+                            <select id="radarLanguage" class="input">
+                                <option value="en">Inglês (EN)</option>
+                                <option value="es">Espanhol (ES)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tradução Automática</label>
+                            <input type="text" id="radarTitleTranslated" class="input" placeholder="Tradução automática aparecerá aqui..." readonly>
+                        </div>
                     </div>
 
                     <button class="btn btn-primary btn-lg" id="btnBuscarRadar">
@@ -260,10 +269,23 @@
                     <h3>YouTube Data API</h3>
                     <div class="form-group">
                         <label>API Key</label>
-                        <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua YouTube Data API Key aqui">
+                        <div class="api-key-input-group">
+                            <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua YouTube Data API Key aqui">
+                            <button class="btn-toggle-visibility" id="btnToggleApiKey">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </button>
+                        </div>
                         <small>Obtenha sua chave em: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></small>
                     </div>
-                    <button class="btn btn-secondary" id="btnSaveApiKey">Salvar API Key</button>
+                    <button class="btn btn-primary" id="btnSaveApiKey">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
+                        </svg>
+                        Salvar API Key
+                    </button>
                 </div>
 
                 <div class="settings-section">
@@ -287,10 +309,10 @@
         </div>
     </main>
 
-    <!-- SUPER MODAL DE PRODUÇÃO -->
-    <div class="modal" id="superModal">
+    <!-- MODAL SIMPLES: CRIAR/EDITAR VÍDEO -->
+    <div class="modal" id="videoModal">
         <div class="modal-backdrop"></div>
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog">
             <div class="modal-header">
                 <h2 id="modalTitle">Novo Vídeo</h2>
                 <button class="btn-close" id="btnCloseModal">
@@ -300,174 +322,22 @@
                 </button>
             </div>
 
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-tab="geral">Geral</button>
-                <button class="modal-tab" data-tab="roteiro">Roteiro & Legenda</button>
-                <button class="modal-tab" data-tab="producao">Produção</button>
-            </div>
-
             <div class="modal-body">
-                <!-- TAB: GERAL -->
-                <div class="tab-pane active" id="tab-geral">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Canal *</label>
-                            <input type="text" id="videoChannel" class="input" placeholder="Nome do Canal" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Título *</label>
-                            <input type="text" id="videoTitle" class="input" placeholder="Título do Vídeo" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Descrição</label>
-                        <textarea id="videoDescription" class="textarea" rows="4" placeholder="Descrição do vídeo (opcional)"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Thumbnail</label>
-                        <div class="upload-area" id="uploadArea">
-                            <input type="file" id="videoThumbFile" accept="image/*" hidden>
-                            <div class="upload-placeholder">
-                                <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
-                                </svg>
-                                <p>Arraste uma imagem ou clique para fazer upload</p>
-                                <span class="upload-hint">PNG, JPG até 5MB</span>
-                            </div>
-                            <div class="upload-preview" id="uploadPreview" style="display: none;">
-                                <img id="previewImage" alt="Preview">
-                                <button class="btn-remove-thumb" id="btnRemoveThumb">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Texto da Thumbnail</label>
-                        <input type="text" id="videoThumbText" class="input" placeholder="Texto que aparecerá na thumbnail">
-                    </div>
+                <div class="form-group">
+                    <label>Canal *</label>
+                    <input type="text" id="videoChannel" class="input" placeholder="Nome do Canal" required>
                 </div>
 
-                <!-- TAB: ROTEIRO & LEGENDA -->
-                <div class="tab-pane" id="tab-roteiro">
-                    <div class="editor-toolbar">
-                        <div class="editor-stats">
-                            <span class="stat">
-                                <strong id="wordCount">0</strong> palavras
-                            </span>
-                            <span class="stat">
-                                <strong id="charCount">0</strong> caracteres
-                            </span>
-                            <span class="stat">
-                                ⏱️ Tempo estimado: <strong id="estimatedTime">0:00</strong>
-                            </span>
-                        </div>
-                        <div class="editor-actions">
-                            <button class="btn btn-secondary" id="btnGenerateSRT">
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
-                                    <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z"/>
-                                </svg>
-                                Gerar SRT
-                            </button>
-                            <button class="btn btn-primary" id="btnCopyCapcut">
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
-                                </svg>
-                                Copiar para CapCut
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Roteiro Completo</label>
-                        <textarea id="videoScript" class="textarea script-editor" rows="20" placeholder="Escreva seu roteiro aqui..."></textarea>
-                    </div>
-                </div>
-
-                <!-- TAB: PRODUÇÃO -->
-                <div class="tab-pane" id="tab-producao">
-                    <div class="production-checklist">
-                        <h3>Checklist de Produção</h3>
-                        <p class="checklist-subtitle">Marque conforme avança na produção</p>
-
-                        <div class="checklist-items">
-                            <label class="checklist-item">
-                                <input type="checkbox" id="checkScript">
-                                <div class="checklist-content">
-                                    <span class="checklist-icon">📝</span>
-                                    <div>
-                                        <strong>Roteiro Pronto</strong>
-                                        <small>Texto final revisado</small>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="checklist-item">
-                                <input type="checkbox" id="checkAudio">
-                                <div class="checklist-content">
-                                    <span class="checklist-icon">🎙️</span>
-                                    <div>
-                                        <strong>Áudio Gravado</strong>
-                                        <small>Narração ou TTS gerado</small>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="checklist-item">
-                                <input type="checkbox" id="checkThumb">
-                                <div class="checklist-content">
-                                    <span class="checklist-icon">📷</span>
-                                    <div>
-                                        <strong>Thumbnail Criada</strong>
-                                        <small>Arte finalizada</small>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="checklist-item">
-                                <input type="checkbox" id="checkEdit">
-                                <div class="checklist-content">
-                                    <span class="checklist-icon">✂️</span>
-                                    <div>
-                                        <strong>Edição Finalizada</strong>
-                                        <small>Vídeo montado</small>
-                                    </div>
-                                </div>
-                            </label>
-
-                            <label class="checklist-item">
-                                <input type="checkbox" id="checkUpload">
-                                <div class="checklist-content">
-                                    <span class="checklist-icon">☁️</span>
-                                    <div>
-                                        <strong>Vídeo Postado</strong>
-                                        <small>Publicado no YouTube</small>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="status-indicator">
-                            <label>Status Atual:</label>
-                            <div class="status-badge" id="currentStatusBadge">
-                                📋 PLANEJAMENTO
-                            </div>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Título do Vídeo *</label>
+                    <input type="text" id="videoTitle" class="input" placeholder="Título do Vídeo" required>
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
                 <button class="btn btn-danger" id="btnDeleteVideo" style="display: none;">Excluir</button>
-                <button class="btn btn-primary" id="btnSaveVideo">Salvar Vídeo</button>
+                <button class="btn btn-primary" id="btnSaveVideo">Salvar</button>
             </div>
         </div>
     </div>

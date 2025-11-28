@@ -1,6 +1,6 @@
 // ==========================================
-// DARK CHANNEL MANAGER v3.0 - SaaS Pro
-// Professional Dashboard Application
+// DARK CHANNEL MANAGER v4.0 - UX Otimizada
+// Checklist Inline + Modal Simples
 // ==========================================
 
 /* ==========================================
@@ -41,6 +41,13 @@ class DataManager {
     addVideo(video) {
         video.id = Date.now().toString();
         video.createdAt = new Date().toISOString();
+        video.checklist = {
+            script: false,
+            audio: false,
+            thumb: false,
+            edit: false,
+            upload: false
+        };
         video.stage = this.calculateStage(video);
         this.videos.push(video);
         this.saveVideos();
@@ -58,6 +65,24 @@ class DataManager {
         return null;
     }
 
+    updateChecklist(id, checklistKey, value) {
+        const video = this.getVideo(id);
+        if (video) {
+            if (!video.checklist) {
+                video.checklist = {
+                    script: false,
+                    audio: false,
+                    thumb: false,
+                    edit: false,
+                    upload: false
+                };
+            }
+            video.checklist[checklistKey] = value;
+            return this.updateVideo(id, { checklist: video.checklist });
+        }
+        return null;
+    }
+
     deleteVideo(id) {
         this.videos = this.videos.filter(v => v.id !== id);
         this.saveVideos();
@@ -70,7 +95,6 @@ class DataManager {
     // Calculate video stage based on checklist
     calculateStage(video) {
         const checklist = video.checklist || {};
-        const totalTasks = 5; // script, audio, thumb, edit, upload
         const completed = [
             checklist.script,
             checklist.audio,
@@ -103,7 +127,6 @@ class DataManager {
         return channels.filter(c => c && c.trim() !== '').sort();
     }
 
-    // Get inactive channels (no ready or posted videos)
     getInactiveChannels() {
         const channels = this.getUniqueChannels();
         return channels.filter(channel => {
@@ -112,7 +135,6 @@ class DataManager {
         });
     }
 
-    // Metrics
     getMetrics() {
         const metrics = {
             planejamento: 0,
@@ -153,7 +175,6 @@ class UIManager {
         this.dataManager = dataManager;
         this.currentPage = 'dashboard';
         this.currentVideoId = null;
-        this.thumbImageData = null;
         this.currentSearchTerm = '';
         this.currentFilters = {
             channel: '',
@@ -167,7 +188,6 @@ class UIManager {
         this.setupNavigation();
         this.setupModalHandlers();
         this.setupVideoHandlers();
-        this.setupEditorHandlers();
         this.setupRadarHandlers();
         this.setupPromptsHandlers();
         this.setupSettingsHandlers();
@@ -214,7 +234,7 @@ class UIManager {
                 this.renderPrompts();
                 break;
             case 'radar':
-                // Radar page is static, no rendering needed
+                // Radar page is static
                 break;
             case 'configuracoes':
                 this.renderSettings();
@@ -301,10 +321,20 @@ class UIManager {
 
         container.innerHTML = videos.map(video => this.renderVideoCard(video)).join('');
 
-        // Add click listeners
-        container.querySelectorAll('.video-card').forEach(card => {
-            card.addEventListener('click', () => {
-                this.openVideoModal(card.dataset.id);
+        // Add click listeners to headers (edit title/channel)
+        container.querySelectorAll('.video-card-header').forEach(header => {
+            header.addEventListener('click', () => {
+                this.openVideoModal(header.closest('.video-card').dataset.id);
+            });
+        });
+
+        // Add checkbox listeners (inline editing)
+        container.querySelectorAll('.video-checklist input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                const videoId = checkbox.closest('.video-card').dataset.id;
+                const checkKey = checkbox.dataset.check;
+                this.updateCheckbox(videoId, checkKey, checkbox.checked);
             });
         });
     }
@@ -336,36 +366,45 @@ class UIManager {
                     </div>
                 </div>
                 <div class="video-checklist">
-                    <span class="check-badge ${checklist.script ? 'completed' : ''}">
-                        ${checklist.script ? '✅' : '☐'} Roteiro
-                    </span>
-                    <span class="check-badge ${checklist.audio ? 'completed' : ''}">
-                        ${checklist.audio ? '✅' : '☐'} Áudio
-                    </span>
-                    <span class="check-badge ${checklist.thumb ? 'completed' : ''}">
-                        ${checklist.thumb ? '✅' : '☐'} Thumb
-                    </span>
-                    <span class="check-badge ${checklist.edit ? 'completed' : ''}">
-                        ${checklist.edit ? '✅' : '☐'} Edição
-                    </span>
-                    <span class="check-badge ${checklist.upload ? 'completed' : ''}">
-                        ${checklist.upload ? '✅' : '☐'} Upload
-                    </span>
+                    <label class="${checklist.script ? 'completed' : ''}">
+                        <input type="checkbox" data-check="script" ${checklist.script ? 'checked' : ''}>
+                        <span>📝 Roteiro</span>
+                    </label>
+                    <label class="${checklist.audio ? 'completed' : ''}">
+                        <input type="checkbox" data-check="audio" ${checklist.audio ? 'checked' : ''}>
+                        <span>🎙️ Áudio</span>
+                    </label>
+                    <label class="${checklist.thumb ? 'completed' : ''}">
+                        <input type="checkbox" data-check="thumb" ${checklist.thumb ? 'checked' : ''}>
+                        <span>📷 Thumb</span>
+                    </label>
+                    <label class="${checklist.edit ? 'completed' : ''}">
+                        <input type="checkbox" data-check="edit" ${checklist.edit ? 'checked' : ''}>
+                        <span>✂️ Edição</span>
+                    </label>
+                    <label class="${checklist.upload ? 'completed' : ''}">
+                        <input type="checkbox" data-check="upload" ${checklist.upload ? 'checked' : ''}>
+                        <span>☁️ Upload</span>
+                    </label>
                 </div>
             </div>
         `;
     }
 
+    updateCheckbox(videoId, checkKey, value) {
+        this.dataManager.updateChecklist(videoId, checkKey, value);
+        this.renderDashboard(); // Refresh to update metrics and borders
+        this.showToast('Status atualizado!', 'success');
+    }
+
     /* ==========================================
-       SUPER MODAL
+       MODAL SIMPLES
        ========================================== */
     setupModalHandlers() {
-        // Open modal button
         document.getElementById('btnNovoVideo').addEventListener('click', () => {
             this.openVideoModal();
         });
 
-        // Close modal
         document.getElementById('btnCloseModal').addEventListener('click', () => {
             this.closeVideoModal();
         });
@@ -374,31 +413,21 @@ class UIManager {
             this.closeVideoModal();
         });
 
-        // Modal tabs
-        document.querySelectorAll('.modal-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                this.switchModalTab(tab.dataset.tab);
-            });
-        });
-
-        // Save video
         document.getElementById('btnSaveVideo').addEventListener('click', () => {
             this.saveVideo();
         });
 
-        // Delete video
         document.getElementById('btnDeleteVideo').addEventListener('click', () => {
             this.deleteVideo();
         });
 
-        // Close on backdrop click
         document.querySelector('.modal-backdrop').addEventListener('click', () => {
             this.closeVideoModal();
         });
     }
 
     openVideoModal(videoId = null) {
-        const modal = document.getElementById('superModal');
+        const modal = document.getElementById('videoModal');
         const modalTitle = document.getElementById('modalTitle');
         const deleteBtn = document.getElementById('btnDeleteVideo');
 
@@ -409,72 +438,24 @@ class UIManager {
             modalTitle.textContent = 'Editar Vídeo';
             deleteBtn.style.display = 'inline-flex';
 
-            // Populate form
             document.getElementById('videoChannel').value = video.channel || '';
             document.getElementById('videoTitle').value = video.title || '';
-            document.getElementById('videoDescription').value = video.description || '';
-            document.getElementById('videoThumbText').value = video.thumbText || '';
-            document.getElementById('videoScript').value = video.script || '';
-
-            // Checklist
-            const checklist = video.checklist || {};
-            document.getElementById('checkScript').checked = checklist.script || false;
-            document.getElementById('checkAudio').checked = checklist.audio || false;
-            document.getElementById('checkThumb').checked = checklist.thumb || false;
-            document.getElementById('checkEdit').checked = checklist.edit || false;
-            document.getElementById('checkUpload').checked = checklist.upload || false;
-
-            // Thumbnail
-            this.thumbImageData = video.thumbImage || null;
-            if (this.thumbImageData) {
-                this.showThumbPreview(this.thumbImageData);
-            }
-
-            this.updateScriptStats();
         } else {
             // Create mode
             this.currentVideoId = null;
             modalTitle.textContent = 'Novo Vídeo';
             deleteBtn.style.display = 'none';
 
-            // Clear form
             document.getElementById('videoChannel').value = '';
             document.getElementById('videoTitle').value = '';
-            document.getElementById('videoDescription').value = '';
-            document.getElementById('videoThumbText').value = '';
-            document.getElementById('videoScript').value = '';
-
-            document.getElementById('checkScript').checked = false;
-            document.getElementById('checkAudio').checked = false;
-            document.getElementById('checkThumb').checked = false;
-            document.getElementById('checkEdit').checked = false;
-            document.getElementById('checkUpload').checked = false;
-
-            this.thumbImageData = null;
-            this.hideThumbPreview();
-            this.updateScriptStats();
         }
 
-        this.updateStatusPreview();
         modal.classList.add('active');
     }
 
     closeVideoModal() {
-        document.getElementById('superModal').classList.remove('active');
+        document.getElementById('videoModal').classList.remove('active');
         this.currentVideoId = null;
-        this.thumbImageData = null;
-    }
-
-    switchModalTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.modal-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-
-        // Update tab panes
-        document.querySelectorAll('.tab-pane').forEach(pane => {
-            pane.classList.toggle('active', pane.id === `tab-${tabName}`);
-        });
     }
 
     saveVideo() {
@@ -488,26 +469,15 @@ class UIManager {
 
         const videoData = {
             channel,
-            title,
-            description: document.getElementById('videoDescription').value.trim(),
-            thumbText: document.getElementById('videoThumbText').value.trim(),
-            thumbImage: this.thumbImageData,
-            script: document.getElementById('videoScript').value.trim(),
-            checklist: {
-                script: document.getElementById('checkScript').checked,
-                audio: document.getElementById('checkAudio').checked,
-                thumb: document.getElementById('checkThumb').checked,
-                edit: document.getElementById('checkEdit').checked,
-                upload: document.getElementById('checkUpload').checked
-            }
+            title
         };
 
         if (this.currentVideoId) {
             this.dataManager.updateVideo(this.currentVideoId, videoData);
-            this.showToast('Vídeo atualizado com sucesso!', 'success');
+            this.showToast('Vídeo atualizado!', 'success');
         } else {
             this.dataManager.addVideo(videoData);
-            this.showToast('Vídeo criado com sucesso!', 'success');
+            this.showToast('Vídeo criado! Use os checkboxes para marcar o progresso.', 'success');
         }
 
         this.closeVideoModal();
@@ -545,248 +515,35 @@ class UIManager {
             this.currentSearchTerm = e.target.value;
             this.renderVideos();
         });
-
-        // Thumbnail upload
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('videoThumbFile');
-
-        uploadArea.addEventListener('click', () => fileInput.click());
-
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('drag-over');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                this.handleThumbUpload(file);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                this.handleThumbUpload(file);
-            }
-        });
-
-        document.getElementById('btnRemoveThumb').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.thumbImageData = null;
-            this.hideThumbPreview();
-        });
-
-        // Checklist change - update status preview
-        ['checkScript', 'checkAudio', 'checkThumb', 'checkEdit', 'checkUpload'].forEach(id => {
-            document.getElementById(id).addEventListener('change', () => {
-                this.updateStatusPreview();
-            });
-        });
-    }
-
-    handleThumbUpload(file) {
-        if (file.size > 5 * 1024 * 1024) {
-            this.showToast('Imagem muito grande! Máximo 5MB', 'error');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            this.thumbImageData = e.target.result;
-            this.showThumbPreview(this.thumbImageData);
-        };
-        reader.readAsDataURL(file);
-    }
-
-    showThumbPreview(imageData) {
-        document.querySelector('.upload-placeholder').style.display = 'none';
-        const preview = document.getElementById('uploadPreview');
-        preview.style.display = 'block';
-        document.getElementById('previewImage').src = imageData;
-    }
-
-    hideThumbPreview() {
-        document.querySelector('.upload-placeholder').style.display = 'block';
-        document.getElementById('uploadPreview').style.display = 'none';
-    }
-
-    updateStatusPreview() {
-        const checklist = {
-            script: document.getElementById('checkScript').checked,
-            audio: document.getElementById('checkAudio').checked,
-            thumb: document.getElementById('checkThumb').checked,
-            edit: document.getElementById('checkEdit').checked,
-            upload: document.getElementById('checkUpload').checked
-        };
-
-        const stage = this.dataManager.calculateStage({ checklist });
-        const statusBadge = document.getElementById('currentStatusBadge');
-
-        const statusMap = {
-            planejamento: { text: '📋 PLANEJAMENTO', class: 'status-planejamento' },
-            producao: { text: '🎬 EM PRODUÇÃO', class: 'status-producao' },
-            finalizado: { text: '✅ PRONTO', class: 'status-finalizado' },
-            postado: { text: '🚀 POSTADO', class: 'status-postado' }
-        };
-
-        const status = statusMap[stage] || statusMap.planejamento;
-        statusBadge.textContent = status.text;
-        statusBadge.className = `status-badge ${status.class}`;
     }
 
     /* ==========================================
-       EDITOR HANDLERS
-       ========================================== */
-    setupEditorHandlers() {
-        const scriptEditor = document.getElementById('videoScript');
-
-        scriptEditor.addEventListener('input', () => {
-            this.updateScriptStats();
-        });
-
-        // Generate SRT
-        document.getElementById('btnGenerateSRT').addEventListener('click', () => {
-            this.generateSRT();
-        });
-
-        // Copy to CapCut
-        document.getElementById('btnCopyCapcut').addEventListener('click', () => {
-            this.copyToCapcut();
-        });
-    }
-
-    updateScriptStats() {
-        const text = document.getElementById('videoScript').value;
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0);
-        const chars = text.length;
-
-        // Estimate narration time (150 words per minute average)
-        const minutes = Math.floor(words.length / 150);
-        const seconds = Math.round(((words.length % 150) / 150) * 60);
-
-        document.getElementById('wordCount').textContent = words.length;
-        document.getElementById('charCount').textContent = chars;
-        document.getElementById('estimatedTime').textContent =
-            `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    generateSRT() {
-        const text = document.getElementById('videoScript').value.trim();
-
-        if (!text) {
-            this.showToast('Escreva um roteiro primeiro', 'error');
-            return;
-        }
-
-        const wordsPerSubtitle = 10;
-        const durationPerSubtitle = 3;
-        const words = text.split(/\s+/).filter(w => w.length > 0);
-
-        let srtContent = '';
-        let currentTime = 0;
-
-        for (let i = 0; i < words.length; i += wordsPerSubtitle) {
-            const subtitleNumber = Math.floor(i / wordsPerSubtitle) + 1;
-            const subtitleWords = words.slice(i, i + wordsPerSubtitle);
-            const subtitleText = subtitleWords.join(' ');
-
-            const startTime = this.formatSRTTime(currentTime);
-            const endTime = this.formatSRTTime(currentTime + durationPerSubtitle);
-
-            srtContent += `${subtitleNumber}\n${startTime} --> ${endTime}\n${subtitleText}\n\n`;
-            currentTime += durationPerSubtitle;
-        }
-
-        // Download SRT file
-        const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `legendas-${Date.now()}.srt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        this.showToast('Arquivo SRT gerado!', 'success');
-    }
-
-    formatSRTTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-        const millis = Math.floor((seconds % 1) * 1000);
-
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(millis).padStart(3, '0')}`;
-    }
-
-    copyToCapcut() {
-        const text = document.getElementById('videoScript').value.trim();
-
-        if (!text) {
-            this.showToast('Escreva um roteiro primeiro', 'error');
-            return;
-        }
-
-        // Split text into ~500 character chunks
-        const chunks = [];
-        const maxChunkSize = 500;
-        const words = text.split(' ');
-        let currentChunk = '';
-
-        words.forEach(word => {
-            if ((currentChunk + word).length > maxChunkSize) {
-                chunks.push(currentChunk.trim());
-                currentChunk = word + ' ';
-            } else {
-                currentChunk += word + ' ';
-            }
-        });
-
-        if (currentChunk.trim()) {
-            chunks.push(currentChunk.trim());
-        }
-
-        // Copy to clipboard
-        const formatted = chunks.map((chunk, i) => `[${i + 1}/${chunks.length}]\n${chunk}`).join('\n\n---\n\n');
-
-        navigator.clipboard.writeText(formatted).then(() => {
-            this.showToast(`Copiado! ${chunks.length} blocos prontos para o CapCut`, 'success');
-        }).catch(() => {
-            this.showToast('Erro ao copiar', 'error');
-        });
-    }
-
-    /* ==========================================
-       RADAR DE TÍTULOS
+       RADAR DE MERCADO
        ========================================== */
     setupRadarHandlers() {
         const inputPT = document.getElementById('radarTitlePT');
-        const inputEN = document.getElementById('radarTitleEN');
+        const inputTranslated = document.getElementById('radarTitleTranslated');
+        const languageSelect = document.getElementById('radarLanguage');
         const btnSearch = document.getElementById('btnBuscarRadar');
 
-        // Auto-translate (simple simulation)
-        inputPT.addEventListener('input', () => {
-            // This would use a real translation API in production
-            inputEN.value = this.simpleTranslate(inputPT.value);
-        });
+        // Auto-translate on input or language change
+        const updateTranslation = () => {
+            const ptText = inputPT.value.trim();
+            const targetLang = languageSelect.value;
+            inputTranslated.value = ptText ? this.translateText(ptText, targetLang) : '';
+        };
+
+        inputPT.addEventListener('input', updateTranslation);
+        languageSelect.addEventListener('change', updateTranslation);
 
         btnSearch.addEventListener('click', () => {
             this.searchYouTube();
         });
     }
 
-    simpleTranslate(text) {
-        // Simple PT-BR to EN translation (for demo)
-        // In production, use Google Translate API or similar
-        const dictionary = {
+    translateText(text, targetLang) {
+        // Simple PT-BR to EN/ES translation dictionary
+        const dictionaryEN = {
             'como': 'how to',
             'ganhar': 'make',
             'dinheiro': 'money',
@@ -796,17 +553,46 @@ class UIManager {
             'melhor': 'best',
             'grátis': 'free',
             'rápido': 'fast',
-            'fácil': 'easy'
+            'fácil': 'easy',
+            'em': 'in',
+            'para': 'for',
+            'com': 'with',
+            'sem': 'without',
+            'mais': 'more',
+            'menos': 'less'
         };
 
-        return text.toLowerCase().split(' ').map(word =>
-            dictionary[word] || word
-        ).join(' ');
+        const dictionaryES = {
+            'como': 'cómo',
+            'ganhar': 'ganar',
+            'dinheiro': 'dinero',
+            'online': 'online',
+            'fazer': 'hacer',
+            'aprender': 'aprender',
+            'melhor': 'mejor',
+            'grátis': 'gratis',
+            'rápido': 'rápido',
+            'fácil': 'fácil',
+            'em': 'en',
+            'para': 'para',
+            'com': 'con',
+            'sem': 'sin',
+            'mais': 'más',
+            'menos': 'menos'
+        };
+
+        const dictionary = targetLang === 'es' ? dictionaryES : dictionaryEN;
+
+        return text.toLowerCase().split(' ').map(word => {
+            // Remove punctuation
+            const cleanWord = word.replace(/[.,!?]/g, '');
+            return dictionary[cleanWord] || word;
+        }).join(' ');
     }
 
     async searchYouTube() {
         const apiKey = this.dataManager.settings.youtubeApiKey;
-        const query = document.getElementById('radarTitleEN').value.trim();
+        const query = document.getElementById('radarTitleTranslated').value.trim();
 
         if (!query) {
             this.showToast('Digite um título primeiro', 'error');
@@ -814,16 +600,19 @@ class UIManager {
         }
 
         if (!apiKey) {
-            this.showToast('Configure sua YouTube API Key nas configurações', 'error');
+            this.showToast('Configure sua YouTube API Key nas configurações primeiro!', 'error');
+            setTimeout(() => {
+                this.navigateTo('configuracoes');
+            }, 1500);
             return;
         }
 
         const resultsContainer = document.getElementById('radarResults');
-        resultsContainer.innerHTML = '<p style="text-align:center;padding:2rem;">Buscando...</p>';
+        resultsContainer.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--slate-400);">🔍 Buscando...</p>';
 
         try {
             const response = await fetch(
-                `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=10&key=${apiKey}`
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=10&order=viewCount&key=${apiKey}`
             );
 
             if (!response.ok) {
@@ -835,15 +624,24 @@ class UIManager {
             if (data.items && data.items.length > 0) {
                 resultsContainer.innerHTML = data.items.map(item => `
                     <div class="radar-result-item">
-                        <h4 style="margin-bottom:0.5rem;">${this.escapeHtml(item.snippet.title)}</h4>
-                        <p style="color:var(--slate-400);font-size:0.875rem;margin-bottom:0.5rem;">
-                            Canal: ${this.escapeHtml(item.snippet.channelTitle)}
-                        </p>
-                        <p style="color:var(--slate-500);font-size:0.8125rem;">
-                            ${this.escapeHtml(item.snippet.description.substring(0, 150))}...
-                        </p>
+                        <div style="display:flex;gap:1rem;margin-bottom:0.75rem;">
+                            <img src="${item.snippet.thumbnails.default.url}"
+                                 alt="Thumbnail"
+                                 style="width:120px;height:90px;object-fit:cover;border-radius:0.5rem;">
+                            <div style="flex:1;">
+                                <h4 style="margin-bottom:0.5rem;color:var(--slate-50);font-size:0.9375rem;">
+                                    ${this.escapeHtml(item.snippet.title)}
+                                </h4>
+                                <p style="color:var(--slate-400);font-size:0.8125rem;margin-bottom:0.375rem;">
+                                    📺 ${this.escapeHtml(item.snippet.channelTitle)}
+                                </p>
+                                <p style="color:var(--slate-500);font-size:0.75rem;">
+                                    📅 ${new Date(item.snippet.publishedAt).toLocaleDateString('pt-BR')}
+                                </p>
+                            </div>
+                        </div>
                         <a href="https://youtube.com/watch?v=${item.id.videoId}" target="_blank"
-                           style="color:var(--primary-400);font-size:0.875rem;text-decoration:none;">
+                           class="btn btn-secondary" style="width:100%;margin-top:0.5rem;">
                             Ver no YouTube →
                         </a>
                     </div>
@@ -855,7 +653,11 @@ class UIManager {
             }
         } catch (error) {
             console.error('YouTube search error:', error);
-            resultsContainer.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--danger-400);">Erro ao buscar. Verifique sua API Key.</p>';
+            resultsContainer.innerHTML = `
+                <p style="text-align:center;padding:2rem;color:var(--danger-400);">
+                    ⚠️ Erro ao buscar. Verifique sua API Key nas configurações.
+                </p>
+            `;
             this.showToast('Erro ao buscar no YouTube', 'error');
         }
     }
@@ -948,13 +750,27 @@ class UIManager {
        SETTINGS
        ========================================== */
     setupSettingsHandlers() {
-        document.getElementById('btnSaveApiKey').addEventListener('click', () => {
-            const apiKey = document.getElementById('youtubeApiKey').value.trim();
-            this.dataManager.settings.youtubeApiKey = apiKey;
-            this.dataManager.saveSettings();
-            this.showToast('API Key salva!', 'success');
+        // Toggle API Key visibility
+        document.getElementById('btnToggleApiKey').addEventListener('click', () => {
+            const input = document.getElementById('youtubeApiKey');
+            input.type = input.type === 'password' ? 'text' : 'password';
         });
 
+        // Save API Key
+        document.getElementById('btnSaveApiKey').addEventListener('click', () => {
+            const apiKey = document.getElementById('youtubeApiKey').value.trim();
+
+            if (!apiKey) {
+                this.showToast('Digite uma API Key válida', 'error');
+                return;
+            }
+
+            this.dataManager.settings.youtubeApiKey = apiKey;
+            this.dataManager.saveSettings();
+            this.showToast('API Key salva com sucesso!', 'success');
+        });
+
+        // Clear all data
         document.getElementById('btnLimparDados').addEventListener('click', () => {
             if (confirm('ATENÇÃO! Isso irá apagar TODOS os dados. Tem certeza?')) {
                 localStorage.clear();
@@ -964,7 +780,8 @@ class UIManager {
     }
 
     renderSettings() {
-        document.getElementById('youtubeApiKey').value = this.dataManager.settings.youtubeApiKey || '';
+        const apiKey = this.dataManager.settings.youtubeApiKey || '';
+        document.getElementById('youtubeApiKey').value = apiKey;
     }
 
     /* ==========================================
@@ -997,7 +814,7 @@ window.exportData = function() {
         prompts: app.dataManager.prompts,
         settings: { ...app.dataManager.settings, youtubeApiKey: '' }, // Don't export API key
         exportDate: new Date().toISOString(),
-        version: '3.0'
+        version: '4.0'
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1019,5 +836,5 @@ window.exportData = function() {
 const dataManager = new DataManager();
 const app = new UIManager(dataManager);
 
-console.log('🚀 Dark Channel Manager v3.0 - SaaS Pro Edition');
-console.log('📊 Dashboard carregado com sucesso!');
+console.log('🚀 Dark Channel Manager v4.0 - UX Otimizada');
+console.log('✅ Checklist inline + Modal simples + Radar melhorado');
