@@ -1196,12 +1196,49 @@ body {
 }
 
 /* ==========================================
+   MOBILE MENU BUTTON
+   ========================================== */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 2001;
+    background: var(--slate-800);
+    border: 1px solid var(--slate-700);
+    color: var(--slate-200);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.mobile-menu-btn:hover {
+    background: var(--slate-700);
+    border-color: var(--slate-600);
+}
+
+.mobile-menu-btn:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================
    RESPONSIVE
    ========================================== */
 @media (max-width: 1024px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+
     .sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 2000;
+        box-shadow: var(--shadow-xl);
     }
 
     .sidebar.mobile-open {
@@ -1211,15 +1248,52 @@ body {
     .main-content {
         margin-left: 0;
     }
+
+    /* Overlay para fechar sidebar */
+    .sidebar.mobile-open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+    }
 }
 
 @media (max-width: 768px) {
     .page {
         padding: 1rem;
+        padding-top: 5rem; /* Espaço para o botão mobile */
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
     }
 
     .metrics-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .metric-card {
+        padding: 1rem;
+    }
+
+    .metric-icon {
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.5rem;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
     }
 
     .filters-section {
@@ -1234,24 +1308,160 @@ body {
         max-width: 100%;
     }
 
-    .modal-dialog {
-        margin: 0;
-        max-height: 100vh;
-        border-radius: 0;
-    }
-
-    .modal-tabs {
-        overflow-x: auto;
-    }
-
-    .modal-tab {
-        font-size: 0.8125rem;
-        padding: 0.875rem 1rem;
-        white-space: nowrap;
+    /* Video Cards Mobile */
+    .video-card {
+        padding: 1rem;
     }
 
     .video-card-header {
         flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .video-status {
+        align-self: flex-start;
+        margin-top: 0.5rem;
+    }
+
+    .video-checklist {
+        gap: 0.5rem;
+    }
+
+    .video-checklist label {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .video-checklist input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /* Modal Mobile */
+    .modal-dialog {
+        margin: 0;
+        max-height: 100vh;
+        border-radius: 0;
+        max-width: 100%;
+    }
+
+    .modal-body {
+        padding: 1rem;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 1rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal-footer {
+        padding: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* Form Elements Mobile */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .textarea {
+        font-size: 0.875rem;
+    }
+
+    #videoScript {
+        font-size: 0.8125rem !important;
+    }
+
+    /* Buttons Mobile */
+    .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-lg {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Radar Mobile */
+    .radar-container {
+        max-width: 100%;
+    }
+
+    .radar-input-section {
+        padding: 1rem;
+    }
+
+    .radar-result-item {
+        padding: 1rem;
+    }
+
+    .radar-result-item > div {
+        flex-direction: column !important;
+    }
+
+    .radar-result-item img {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Settings Mobile */
+    .settings-container {
+        max-width: 100%;
+    }
+
+    .settings-section {
+        padding: 1rem;
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+
+    .settings-actions .btn {
+        width: 100%;
+    }
+
+    /* Channels & Prompts Grid */
+    .channels-grid,
+    .prompts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Toast Mobile */
+    .toast {
+        left: 1rem;
+        right: 1rem;
+        top: 5rem;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .video-checklist {
+        flex-direction: column;
+    }
+
+    .video-checklist label {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
     }
 }
 

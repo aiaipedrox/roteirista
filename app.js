@@ -186,12 +186,41 @@ class UIManager {
 
     init() {
         this.setupNavigation();
+        this.setupMobileMenu();
         this.setupModalHandlers();
         this.setupVideoHandlers();
         this.setupRadarHandlers();
         this.setupPromptsHandlers();
         this.setupSettingsHandlers();
         this.renderCurrentPage();
+    }
+
+    /* ==========================================
+       MOBILE MENU
+       ========================================== */
+    setupMobileMenu() {
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        // Fechar sidebar ao clicar em um item de navegação (mobile)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        });
+
+        // Fechar sidebar ao clicar no overlay (mobile)
+        sidebar.addEventListener('click', (e) => {
+            if (e.target === sidebar && sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+            }
+        });
     }
 
     /* ==========================================
