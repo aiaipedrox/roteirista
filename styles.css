@@ -1231,34 +1231,41 @@ body {
    ========================================== */
 @media (max-width: 1024px) {
     .mobile-menu-btn {
-        display: flex;
+        display: flex !important;
     }
 
     .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: var(--sidebar-width);
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 2000;
         box-shadow: var(--shadow-xl);
+        overflow-y: auto;
     }
 
     .sidebar.mobile-open {
-        transform: translateX(0);
+        transform: translateX(0) !important;
     }
 
     .main-content {
         margin-left: 0;
     }
 
-    /* Overlay para fechar sidebar */
-    .sidebar.mobile-open::before {
+    /* Overlay backdrop */
+    body.sidebar-open::after {
         content: '';
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: -1;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1999;
+        animation: fadeIn 0.3s ease;
     }
 }
 

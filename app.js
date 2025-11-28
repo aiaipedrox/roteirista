@@ -202,23 +202,51 @@ class UIManager {
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const sidebar = document.getElementById('sidebar');
 
-        mobileMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('mobile-open');
-        });
+        if (!mobileMenuBtn || !sidebar) {
+            console.error('Mobile menu elements not found');
+            return;
+        }
+
+        const toggleSidebar = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            const isOpen = sidebar.classList.toggle('mobile-open');
+            document.body.classList.toggle('sidebar-open', isOpen);
+            console.log('Menu toggled, is open:', isOpen);
+        };
+
+        const closeSidebar = () => {
+            sidebar.classList.remove('mobile-open');
+            document.body.classList.remove('sidebar-open');
+        };
+
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
 
         // Fechar sidebar ao clicar em um item de navegação (mobile)
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 if (window.innerWidth <= 1024) {
-                    sidebar.classList.remove('mobile-open');
+                    closeSidebar();
                 }
             });
         });
 
-        // Fechar sidebar ao clicar no overlay (mobile)
-        sidebar.addEventListener('click', (e) => {
-            if (e.target === sidebar && sidebar.classList.contains('mobile-open')) {
-                sidebar.classList.remove('mobile-open');
+        // Fechar sidebar ao clicar no overlay (backdrop)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024 &&
+                sidebar.classList.contains('mobile-open') &&
+                !sidebar.contains(e.target) &&
+                !mobileMenuBtn.contains(e.target)) {
+                closeSidebar();
+            }
+        });
+
+        // Fechar sidebar ao pressionar ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('mobile-open')) {
+                closeSidebar();
             }
         });
     }
