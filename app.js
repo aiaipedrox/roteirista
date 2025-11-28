@@ -188,6 +188,7 @@ class UIManager {
         this.setupNavigation();
         this.setupMobileMenu();
         this.setupModalHandlers();
+        this.setupThumbnailUpload();
         this.setupVideoHandlers();
         this.setupRadarHandlers();
         this.setupPromptsHandlers();
@@ -501,6 +502,107 @@ class UIManager {
         });
     }
 
+    /* ==========================================
+       THUMBNAIL UPLOAD
+       ========================================== */
+    setupThumbnailUpload() {
+        const dropzone = document.getElementById('thumbnailDropzone');
+        const input = document.getElementById('thumbnailInput');
+        const preview = document.getElementById('thumbnailPreview');
+        const previewImage = document.getElementById('thumbnailImage');
+        const btnRemove = document.getElementById('btnRemoveThumbnail');
+
+        // Click to select file
+        dropzone.addEventListener('click', () => {
+            input.click();
+        });
+
+        // File input change
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.handleThumbnailFile(file);
+            }
+        });
+
+        // Drag and drop events
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                this.handleThumbnailFile(file);
+            } else {
+                this.showToast('Por favor, selecione uma imagem válida', 'error');
+            }
+        });
+
+        // Remove thumbnail
+        btnRemove.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.clearThumbnail();
+        });
+    }
+
+    handleThumbnailFile(file) {
+        // Validate file size (5MB max)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+            this.showToast('Imagem muito grande! Tamanho máximo: 5MB', 'error');
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            this.showToast('Por favor, selecione uma imagem válida', 'error');
+            return;
+        }
+
+        // Convert to Base64
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64 = e.target.result;
+            this.displayThumbnailPreview(base64);
+            this.showToast('Thumbnail carregada!', 'success');
+        };
+        reader.onerror = () => {
+            this.showToast('Erro ao carregar imagem', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    displayThumbnailPreview(base64) {
+        const dropzone = document.getElementById('thumbnailDropzone');
+        const preview = document.getElementById('thumbnailPreview');
+        const previewImage = document.getElementById('thumbnailImage');
+
+        previewImage.src = base64;
+        dropzone.style.display = 'none';
+        preview.style.display = 'block';
+    }
+
+    clearThumbnail() {
+        const dropzone = document.getElementById('thumbnailDropzone');
+        const preview = document.getElementById('thumbnailPreview');
+        const previewImage = document.getElementById('thumbnailImage');
+        const input = document.getElementById('thumbnailInput');
+
+        previewImage.src = '';
+        input.value = '';
+        dropzone.style.display = 'flex';
+        preview.style.display = 'none';
+    }
+
     openVideoModal(videoId = null) {
         const modal = document.getElementById('videoModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -517,6 +619,13 @@ class UIManager {
             document.getElementById('videoTitle').value = video.title || '';
             document.getElementById('videoDescription').value = video.description || '';
             document.getElementById('videoScript').value = video.script || '';
+
+            // Load thumbnail if exists
+            if (video.thumbnail) {
+                this.displayThumbnailPreview(video.thumbnail);
+            } else {
+                this.clearThumbnail();
+            }
         } else {
             // Create mode
             this.currentVideoId = null;
@@ -527,6 +636,7 @@ class UIManager {
             document.getElementById('videoTitle').value = '';
             document.getElementById('videoDescription').value = '';
             document.getElementById('videoScript').value = '';
+            this.clearThumbnail();
         }
 
         modal.classList.add('active');
@@ -546,11 +656,18 @@ class UIManager {
             return;
         }
 
+        // Get thumbnail Base64 if exists
+        const thumbnailImage = document.getElementById('thumbnailImage');
+        const thumbnail = thumbnailImage.src && thumbnailImage.src.startsWith('data:')
+            ? thumbnailImage.src
+            : '';
+
         const videoData = {
             channel,
             title,
             description: document.getElementById('videoDescription').value.trim(),
-            script: document.getElementById('videoScript').value.trim()
+            script: document.getElementById('videoScript').value.trim(),
+            thumbnail: thumbnail
         };
 
         if (this.currentVideoId) {
