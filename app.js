@@ -421,8 +421,26 @@ class UIManager {
             this.deleteVideo();
         });
 
+        document.getElementById('btnCopyScript').addEventListener('click', () => {
+            this.copyScript();
+        });
+
         document.querySelector('.modal-backdrop').addEventListener('click', () => {
             this.closeVideoModal();
+        });
+    }
+
+    copyScript() {
+        const script = document.getElementById('videoScript').value.trim();
+        if (!script) {
+            this.showToast('Roteiro vazio', 'error');
+            return;
+        }
+
+        navigator.clipboard.writeText(script).then(() => {
+            this.showToast('Roteiro copiado para a área de transferência!', 'success');
+        }).catch(() => {
+            this.showToast('Erro ao copiar', 'error');
         });
     }
 
@@ -440,6 +458,8 @@ class UIManager {
 
             document.getElementById('videoChannel').value = video.channel || '';
             document.getElementById('videoTitle').value = video.title || '';
+            document.getElementById('videoDescription').value = video.description || '';
+            document.getElementById('videoScript').value = video.script || '';
         } else {
             // Create mode
             this.currentVideoId = null;
@@ -448,6 +468,8 @@ class UIManager {
 
             document.getElementById('videoChannel').value = '';
             document.getElementById('videoTitle').value = '';
+            document.getElementById('videoDescription').value = '';
+            document.getElementById('videoScript').value = '';
         }
 
         modal.classList.add('active');
@@ -469,7 +491,9 @@ class UIManager {
 
         const videoData = {
             channel,
-            title
+            title,
+            description: document.getElementById('videoDescription').value.trim(),
+            script: document.getElementById('videoScript').value.trim()
         };
 
         if (this.currentVideoId) {
@@ -611,8 +635,13 @@ class UIManager {
         resultsContainer.innerHTML = '<p style="text-align:center;padding:2rem;color:var(--slate-400);">🔍 Buscando...</p>';
 
         try {
+            // Calcular data de 30 dias atrás (formato RFC 3339)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const publishedAfter = thirtyDaysAgo.toISOString();
+
             const response = await fetch(
-                `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=10&order=viewCount&key=${apiKey}`
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=10&order=viewCount&videoDuration=medium&publishedAfter=${publishedAfter}&key=${apiKey}`
             );
 
             if (!response.ok) {

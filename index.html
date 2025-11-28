@@ -332,6 +332,23 @@
                     <label>Título do Vídeo *</label>
                     <input type="text" id="videoTitle" class="input" placeholder="Título do Vídeo" required>
                 </div>
+
+                <div class="form-group">
+                    <label>Descrição do Vídeo</label>
+                    <textarea id="videoDescription" class="textarea" rows="3" placeholder="Descrição que será usada no YouTube"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Roteiro Completo</label>
+                    <textarea id="videoScript" class="textarea" rows="10" placeholder="Escreva o roteiro do vídeo aqui..." style="font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 0.875rem;"></textarea>
+                    <button type="button" class="btn btn-secondary" id="btnCopyScript" style="margin-top: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                        </svg>
+                        Copiar Roteiro
+                    </button>
+                </div>
             </div>
 
             <div class="modal-footer">
