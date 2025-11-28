@@ -44,14 +44,28 @@ Sistema completo para gerenciamento de produção de vídeos para canais dark. I
 
 ## 🚀 Como Usar
 
-### Instalação
+### 🌐 Hospedagem Online (GitHub Pages)
+
+**A forma mais fácil de usar de qualquer dispositivo!**
+
+📖 **[Veja o guia completo de deploy](DEPLOY.md)**
+
+**Resumo rápido:**
+1. Acesse seu repositório no GitHub
+2. Vá em **Settings → Pages**
+3. Em **Source**, selecione a branch `main`
+4. Clique em **Save**
+5. Aguarde 2-3 minutos
+6. Acesse: `https://aiaipedrox.github.io/roteirista/`
+
+### 💻 Instalação Local
 1. Clone ou baixe este repositório
 2. Abra o arquivo `index.html` em qualquer navegador moderno
 3. Não precisa instalar nada, funciona 100% offline!
 
-### Uso no Celular
-1. Abra o `index.html` no navegador do celular
-2. Adicione à tela inicial para acesso rápido:
+### 📱 Uso no Celular
+1. Acesse o site online OU abra o `index.html` no navegador do celular
+2. Adicione à tela inicial para acesso rápido como app:
    - **iPhone/Safari:** Toque no botão de compartilhar > "Adicionar à Tela de Início"
    - **Android/Chrome:** Menu (⋮) > "Adicionar à tela inicial"
 
