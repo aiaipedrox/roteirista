@@ -39,20 +39,22 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-page="dashboard">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-                </svg>
-                <span>Dashboard</span>
-            </a>
+            <!-- MEUS CANAIS -->
+            <div class="channels-section">
+                <div class="channels-header">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.05em;">Meus Canais</span>
+                    <button class="btn-add-channel" id="btnAddChannel" title="Criar Novo Canal">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="channelsList" class="channels-list"></div>
+            </div>
 
-            <a href="#" class="nav-item" data-page="canais">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
-                </svg>
-                <span>Canais</span>
-            </a>
+            <div class="nav-divider"></div>
 
+            <!-- OUTRAS PÁGINAS -->
             <a href="#" class="nav-item" data-page="prompts">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"/>
@@ -94,10 +96,10 @@
         <div class="page active" id="dashboard-page">
             <div class="page-header">
                 <div>
-                    <h1>Dashboard</h1>
-                    <p class="page-subtitle">Visão geral da sua produção de conteúdo</p>
+                    <h1 id="dashboardTitle">Dashboard</h1>
+                    <p class="page-subtitle" id="dashboardSubtitle">Selecione um canal na sidebar para começar</p>
                 </div>
-                <button class="btn btn-primary" id="btnNovoVideo">
+                <button class="btn btn-primary" id="btnNovoVideo" style="display: none;">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
                     </svg>
@@ -156,9 +158,6 @@
             <!-- FILTROS -->
             <div class="filters-section">
                 <div class="filters-group">
-                    <select id="filterChannel" class="filter-select">
-                        <option value="">Todos os Canais</option>
-                    </select>
                     <select id="filterStatus" class="filter-select">
                         <option value="">Todos os Status</option>
                         <option value="planejamento">📋 Planejamento</option>
@@ -331,11 +330,6 @@
 
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Canal *</label>
-                    <input type="text" id="videoChannel" class="input" placeholder="Nome do Canal" required>
-                </div>
-
-                <div class="form-group">
                     <label>Título do Vídeo *</label>
                     <input type="text" id="videoTitle" class="input" placeholder="Título do Vídeo" required>
                 </div>
@@ -385,6 +379,34 @@
                 <button class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
                 <button class="btn btn-danger" id="btnDeleteVideo" style="display: none;">Excluir</button>
                 <button class="btn btn-primary" id="btnSaveVideo">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CRIAR CANAL -->
+    <div class="modal" id="channelModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Criar Novo Canal</h2>
+                <button class="btn-close" id="btnCloseChannelModal">
+                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nome do Canal *</label>
+                    <input type="text" id="channelName" class="input" placeholder="Ex: Curiosidades, Tech News, Gameplays..." required autofocus>
+                    <small style="color: var(--slate-400); display: block; margin-top: 0.5rem;">Este será o nome do seu canal de vídeos.</small>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnCancelChannelModal">Cancelar</button>
+                <button class="btn btn-primary" id="btnSaveChannel">Criar Canal</button>
             </div>
         </div>
     </div>
