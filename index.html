@@ -156,6 +156,17 @@
                 <p class="page-subtitle">Descubra nichos virais no YouTube</p>
             </div>
 
+            <!-- Help Alert -->
+            <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                <strong>💡 Como usar:</strong>
+                <ol style="margin: 0.5rem 0 0 1.25rem; padding: 0;">
+                    <li>Configure sua <strong>YouTube API Key</strong> em Configurações</li>
+                    <li>Digite um tema ou nicho (ex: "minecraft tutorial", "receitas fit")</li>
+                    <li>Clique em "Caçar Nichos" para ver vídeos virais dos últimos 30 dias</li>
+                    <li>O <strong>Score Viral</strong> mostra: Views ÷ Inscritos do canal</li>
+                </ol>
+            </div>
+
             <div class="hunter-input">
                 <input type="text" id="hunterQuery" class="input-lg" placeholder="Digite um tema (ex: minecraft, finanças, culinária)">
                 <button class="btn btn-primary btn-lg" id="btnHunterSearch">
@@ -176,18 +187,33 @@
                 <p class="page-subtitle">APIs e Preferências</p>
             </div>
 
+            <!-- Quick Guide -->
+            <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                <strong>🔑 Como obter as API Keys:</strong>
+                <ul style="margin: 0.5rem 0 0 1.25rem; padding: 0;">
+                    <li><strong>YouTube API:</strong> <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--neon-blue);">Google Cloud Console</a> → Criar credenciais → Chave de API</li>
+                    <li><strong>Gemini API:</strong> <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--neon-purple);">Google AI Studio</a> → Get API key → Create API key</li>
+                </ul>
+            </div>
+
             <div class="settings-section">
                 <h3>YouTube Data API v3</h3>
+                <p style="color: var(--slate-400); font-size: 0.875rem; margin-bottom: 1rem;">
+                    Necessária para o <strong>Channel Hunter</strong>. Permite buscar vídeos virais e calcular scores.
+                </p>
                 <div class="form-group">
                     <label>API Key</label>
                     <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua chave aqui">
-                    <small>Obtenha em: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></small>
+                    <small>Obtenha em: <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Google Cloud Console</a></small>
                 </div>
                 <button class="btn btn-primary" id="btnSaveYouTubeKey">Salvar YouTube Key</button>
             </div>
 
             <div class="settings-section">
                 <h3>Google Gemini API</h3>
+                <p style="color: var(--slate-400); font-size: 0.875rem; margin-bottom: 1rem;">
+                    Necessária para <strong>otimizar títulos</strong> e <strong>analisar thumbnails</strong> com IA no modal de vídeos.
+                </p>
                 <div class="form-group">
                     <label>API Key</label>
                     <input type="password" id="geminiApiKey" class="input" placeholder="Cole sua chave Gemini aqui">
