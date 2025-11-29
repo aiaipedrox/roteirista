@@ -1188,6 +1188,85 @@ body {
 }
 
 /* ==========================================
+   CANAIS PAGE
+   ========================================== */
+.canais-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.canal-card {
+    background: var(--slate-800);
+    border: 1px solid var(--slate-700);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.canal-card:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 0 1px var(--neon-blue);
+}
+
+.canal-card.active {
+    border-color: var(--neon-blue);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.05));
+    box-shadow: var(--glow-blue);
+}
+
+.canal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.canal-card-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--slate-50);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.canal-card-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.canal-stat {
+    background: var(--slate-900);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.canal-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--slate-50);
+    display: block;
+}
+
+.canal-stat-label {
+    font-size: 0.75rem;
+    color: var(--slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-lg {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* ==========================================
    UTILITIES
    ========================================== */
 .empty-state {

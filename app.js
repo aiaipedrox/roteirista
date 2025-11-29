@@ -573,11 +573,11 @@ class UIManager {
             });
         }
 
-        // Bottom menu toggle
+        // Bottom "Canais" button
         const btnBottomMenu = document.getElementById('btnBottomMenu');
         if (btnBottomMenu) {
             btnBottomMenu.addEventListener('click', () => {
-                this.toggleMobileMenu();
+                this.navigateTo('canais');
             });
         }
     }
@@ -650,6 +650,9 @@ class UIManager {
             case 'dashboard':
                 this.renderDashboard();
                 break;
+            case 'canais':
+                this.renderCanaisPage();
+                break;
             case 'hunter':
                 // Hunter page is mostly static
                 break;
@@ -664,12 +667,19 @@ class UIManager {
        ========================================== */
     setupChannelModal() {
         const btnAddChannel = document.getElementById('btnAddChannel');
+        const btnCriarCanalMobile = document.getElementById('btnCriarCanalMobile');
         const btnCloseChannel = document.getElementById('btnCloseChannelModal');
         const btnCancelChannel = document.getElementById('btnCancelChannelModal');
         const btnSaveChannel = document.getElementById('btnSaveChannel');
 
         if (btnAddChannel) {
             btnAddChannel.addEventListener('click', () => {
+                this.openChannelModal();
+            });
+        }
+
+        if (btnCriarCanalMobile) {
+            btnCriarCanalMobile.addEventListener('click', () => {
                 this.openChannelModal();
             });
         }
@@ -731,6 +741,12 @@ class UIManager {
         this.showToast(`Canal "${name}" criado!`, 'success');
         this.closeChannelModal();
         this.renderChannelsList();
+
+        // Update canais page if we're on it
+        if (this.currentPage === 'canais') {
+            this.renderCanaisPage();
+        }
+
         this.selectChannel(channel.id);
     }
 
@@ -753,7 +769,13 @@ class UIManager {
         }
 
         this.renderChannelsList();
-        this.renderDashboard();
+
+        // Update canais page if we're on it, otherwise update dashboard
+        if (this.currentPage === 'canais') {
+            this.renderCanaisPage();
+        } else {
+            this.renderDashboard();
+        }
     }
 
     selectChannel(channelId) {
@@ -801,6 +823,73 @@ class UIManager {
             });
         });
 
+        container.querySelectorAll('.btn-delete-channel').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteChannel(btn.dataset.channelId);
+            });
+        });
+    }
+
+    /* ==========================================
+       CANAIS PAGE
+       ========================================== */
+    renderCanaisPage() {
+        const container = document.getElementById('canaisGrid');
+        if (!container) return;
+
+        const channels = this.dataManager.channels;
+
+        if (channels.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📺</div>
+                    <p>Nenhum canal criado ainda.<br>Clique no botão acima para criar seu primeiro canal!</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = channels.map(channel => {
+            const videos = this.dataManager.getChannelVideos(channel.id);
+            const totalVideos = videos.length;
+            const postedVideos = videos.filter(v => v.stage === 'postado').length;
+
+            return `
+                <div class="canal-card ${this.selectedChannel === channel.id ? 'active' : ''}" data-channel-id="${channel.id}">
+                    <div class="canal-card-header">
+                        <div class="canal-card-name">
+                            📺 ${this.escapeHtml(channel.name)}
+                        </div>
+                        <button class="btn-icon btn-delete-channel" data-channel-id="${channel.id}" title="Excluir canal">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="canal-card-stats">
+                        <div class="canal-stat">
+                            <span class="canal-stat-value">${totalVideos}</span>
+                            <span class="canal-stat-label">Total</span>
+                        </div>
+                        <div class="canal-stat">
+                            <span class="canal-stat-value">${postedVideos}</span>
+                            <span class="canal-stat-label">Postados</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click listeners to select channel
+        container.querySelectorAll('.canal-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-delete-channel')) return;
+                this.selectChannel(card.dataset.channelId);
+            });
+        });
+
+        // Add delete listeners
         container.querySelectorAll('.btn-delete-channel').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();

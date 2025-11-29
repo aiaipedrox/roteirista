@@ -132,6 +132,23 @@
             <div id="videosList" class="videos-grid"></div>
         </div>
 
+        <!-- PÁGINA DE CANAIS -->
+        <div class="page" id="canais-page">
+            <div class="page-header">
+                <h1>📺 Meus Canais</h1>
+                <p class="page-subtitle">Gerencie seus canais do YouTube</p>
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="btnCriarCanalMobile" style="width: 100%; margin-bottom: 2rem;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                </svg>
+                Criar Novo Canal
+            </button>
+
+            <div id="canaisGrid" class="canais-grid"></div>
+        </div>
+
         <!-- CHANNEL HUNTER -->
         <div class="page" id="hunter-page">
             <div class="page-header">
@@ -141,7 +158,7 @@
 
             <div class="hunter-input">
                 <input type="text" id="hunterQuery" class="input-lg" placeholder="Digite um tema (ex: minecraft, finanças, culinária)">
-                <button class="btn btn-primary btn-lg" id="btnHunt">
+                <button class="btn btn-primary btn-lg" id="btnHunterSearch">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
                     </svg>
@@ -166,6 +183,7 @@
                     <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua chave aqui">
                     <small>Obtenha em: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></small>
                 </div>
+                <button class="btn btn-primary" id="btnSaveYouTubeKey">Salvar YouTube Key</button>
             </div>
 
             <div class="settings-section">
@@ -175,9 +193,13 @@
                     <input type="password" id="geminiApiKey" class="input" placeholder="Cole sua chave Gemini aqui">
                     <small>Obtenha em: <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
                 </div>
+                <button class="btn btn-primary" id="btnSaveGeminiKey">Salvar Gemini Key</button>
             </div>
 
-            <button class="btn btn-primary" id="btnSaveConfig">Salvar Configurações</button>
+            <div class="settings-section">
+                <h3>Zona de Perigo</h3>
+                <button class="btn btn-danger" id="btnClearData">Limpar Todos os Dados</button>
+            </div>
         </div>
     </main>
 
