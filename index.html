@@ -5,45 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dark Channel Manager - Dashboard</title>
+    <title>Dark Channel Manager v2.0 - Empire Mode</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- MOBILE MENU BUTTON -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
-        </svg>
-    </button>
+    <!-- XP/GAMIFICATION BAR (Top) -->
+    <div class="gamification-bar" id="gamificationBar">
+        <div class="empire-badge">
+            <div class="badge-icon" id="badgeIcon">🏆</div>
+            <div class="badge-info">
+                <span class="badge-level" id="badgeLevel">Iniciante</span>
+                <span class="badge-videos" id="badgeVideos">0/10 vídeos</span>
+            </div>
+        </div>
+        <div class="xp-progress">
+            <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+        </div>
+    </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (Desktop) -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
-                    <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" fill="white" opacity="0.9"/>
-                    <defs>
-                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
-                            <stop offset="0%" stop-color="#3b82f6"/>
-                            <stop offset="100%" stop-color="#8b5cf6"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span>Dark Channel</span>
+                <div class="logo-icon">⚡</div>
+                <span>Empire Mode</span>
             </div>
         </div>
 
         <nav class="sidebar-nav">
-            <!-- MEUS CANAIS -->
-            <div class="channels-section">
-                <div class="channels-header">
-                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.05em;">Meus Canais</span>
-                    <button class="btn-add-channel" id="btnAddChannel" title="Criar Novo Canal">
+            <!-- Meus Canais -->
+            <div class="nav-section">
+                <div class="nav-section-header">
+                    <span>Meus Canais</span>
+                    <button class="btn-icon-sm" id="btnAddChannel" title="Criar Canal">
                         <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
                         </svg>
@@ -54,50 +50,39 @@
 
             <div class="nav-divider"></div>
 
-            <!-- OUTRAS PÁGINAS -->
-            <a href="#" class="nav-item" data-page="prompts">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"/>
-                </svg>
-                <span>Biblioteca de Prompts</span>
-            </a>
-
-            <a href="#" class="nav-item" data-page="radar">
+            <!-- Ferramentas -->
+            <a href="#" class="nav-item" data-page="hunter">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9 9a2 2 0 114 0 2 2 0 01-4 0z"/>
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-3.446 6.032l-2.261 2.26a1 1 0 101.414 1.415l2.261-2.261A4 4 0 1011 5z"/>
                 </svg>
-                <span>Radar de Mercado</span>
+                <span>Channel Hunter</span>
             </a>
 
-            <div class="nav-divider"></div>
-
-            <a href="#" class="nav-item" data-page="configuracoes">
+            <a href="#" class="nav-item" data-page="config">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"/>
                 </svg>
                 <span>Configurações</span>
             </a>
         </nav>
-
-        <div class="sidebar-footer">
-            <button class="btn-export" onclick="exportData()">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
-                </svg>
-                <span>Exportar Dados</span>
-            </button>
-        </div>
     </aside>
+
+    <!-- MOBILE MENU TOGGLE -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+        </svg>
+    </button>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-        <!-- DASHBOARD PAGE -->
+        <!-- DASHBOARD (Canal Selecionado) -->
         <div class="page active" id="dashboard-page">
             <div class="page-header">
                 <div>
                     <h1 id="dashboardTitle">Dashboard</h1>
-                    <p class="page-subtitle" id="dashboardSubtitle">Selecione um canal na sidebar para começar</p>
+                    <p class="page-subtitle" id="dashboardSubtitle">Selecione um canal para começar</p>
                 </div>
                 <button class="btn btn-primary" id="btnNovoVideo" style="display: none;">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -107,307 +92,282 @@
                 </button>
             </div>
 
-            <!-- MÉTRICAS -->
-            <div class="metrics-grid">
-                <div class="metric-card metric-planning">
-                    <div class="metric-icon">📋</div>
-                    <div class="metric-content">
-                        <div class="metric-label">Planejamento</div>
-                        <div class="metric-value" id="metricPlanning">0</div>
-                    </div>
+            <!-- Métricas Workflow -->
+            <div class="workflow-metrics" id="workflowMetrics">
+                <div class="workflow-card">
+                    <div class="workflow-icon">📋</div>
+                    <div class="workflow-count" id="metricPlanning">0</div>
+                    <div class="workflow-label">Planejamento</div>
                 </div>
-
-                <div class="metric-card metric-production">
-                    <div class="metric-icon">🎬</div>
-                    <div class="metric-content">
-                        <div class="metric-label">Em Produção</div>
-                        <div class="metric-value" id="metricProduction">0</div>
-                    </div>
+                <div class="workflow-card">
+                    <div class="workflow-icon">🎬</div>
+                    <div class="workflow-count" id="metricProduction">0</div>
+                    <div class="workflow-label">Produção</div>
                 </div>
-
-                <div class="metric-card metric-ready">
-                    <div class="metric-icon">✅</div>
-                    <div class="metric-content">
-                        <div class="metric-label">Prontos</div>
-                        <div class="metric-value" id="metricReady">0</div>
-                    </div>
+                <div class="workflow-card">
+                    <div class="workflow-icon">✅</div>
+                    <div class="workflow-count" id="metricReady">0</div>
+                    <div class="workflow-label">Prontos</div>
                 </div>
-
-                <div class="metric-card metric-posted">
-                    <div class="metric-icon">🚀</div>
-                    <div class="metric-content">
-                        <div class="metric-label">Postados</div>
-                        <div class="metric-value" id="metricPosted">0</div>
-                    </div>
+                <div class="workflow-card workflow-posted">
+                    <div class="workflow-icon">🚀</div>
+                    <div class="workflow-count" id="metricPosted">0</div>
+                    <div class="workflow-label">Postados</div>
                 </div>
             </div>
 
-            <!-- ALERTA DE CANAIS PARADOS -->
-            <div class="alert-section" id="inactiveAlert" style="display: none;">
-                <div class="alert alert-danger">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/>
-                    </svg>
-                    <div>
-                        <strong>Atenção: Canais Parados Detectados!</strong>
-                        <p id="inactiveChannelsList"></p>
-                    </div>
-                </div>
+            <!-- Filtros -->
+            <div class="filters-bar">
+                <select id="filterStatus" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="planejamento">Planejamento</option>
+                    <option value="producao">Produção</option>
+                    <option value="finalizado">Prontos</option>
+                    <option value="postado">Postados</option>
+                </select>
+                <input type="text" id="searchVideos" class="search-input" placeholder="Buscar vídeo...">
             </div>
 
-            <!-- FILTROS -->
-            <div class="filters-section">
-                <div class="filters-group">
-                    <select id="filterStatus" class="filter-select">
-                        <option value="">Todos os Status</option>
-                        <option value="planejamento">📋 Planejamento</option>
-                        <option value="producao">🎬 Em Produção</option>
-                        <option value="finalizado">✅ Prontos</option>
-                        <option value="postado">🚀 Postados</option>
-                    </select>
-                </div>
-                <div class="search-box">
+            <!-- Lista de Vídeos -->
+            <div id="videosList" class="videos-grid"></div>
+        </div>
+
+        <!-- CHANNEL HUNTER -->
+        <div class="page" id="hunter-page">
+            <div class="page-header">
+                <h1>🎯 Channel Hunter</h1>
+                <p class="page-subtitle">Descubra nichos virais no YouTube</p>
+            </div>
+
+            <div class="hunter-input">
+                <input type="text" id="hunterQuery" class="input-lg" placeholder="Digite um tema (ex: minecraft, finanças, culinária)">
+                <button class="btn btn-primary btn-lg" id="btnHunt">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
                     </svg>
-                    <input type="text" id="searchVideos" placeholder="Buscar vídeos...">
-                </div>
-            </div>
-
-            <!-- LISTA DE VÍDEOS -->
-            <div class="videos-container">
-                <div class="section-header-inline">
-                    <h2>Vídeos</h2>
-                    <span class="count-badge" id="videosCount">0 vídeos</span>
-                </div>
-                <div class="videos-list" id="videosList"></div>
-            </div>
-        </div>
-
-        <!-- CANAIS PAGE -->
-        <div class="page" id="canais-page">
-            <div class="page-header">
-                <div>
-                    <h1>Gerenciar Canais</h1>
-                    <p class="page-subtitle">Organize e monitore seus canais</p>
-                </div>
-            </div>
-            <div class="channels-grid" id="channelsGrid"></div>
-        </div>
-
-        <!-- PROMPTS PAGE -->
-        <div class="page" id="prompts-page">
-            <div class="page-header">
-                <div>
-                    <h1>Biblioteca de Prompts</h1>
-                    <p class="page-subtitle">Salve e reutilize seus prompts favoritos</p>
-                </div>
-                <button class="btn btn-primary" id="btnNovoPrompt">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                    </svg>
-                    Novo Prompt
+                    Caçar Nichos
                 </button>
             </div>
-            <div class="prompts-grid" id="promptsGrid"></div>
+
+            <div id="hunterResults" class="hunter-results"></div>
         </div>
 
-        <!-- RADAR PAGE -->
-        <div class="page" id="radar-page">
+        <!-- CONFIGURAÇÕES -->
+        <div class="page" id="config-page">
             <div class="page-header">
-                <div>
-                    <h1>Radar de Mercado</h1>
-                    <p class="page-subtitle">Analise a concorrência de títulos no YouTube</p>
+                <h1>⚙️ Configurações</h1>
+                <p class="page-subtitle">APIs e Preferências</p>
+            </div>
+
+            <div class="settings-section">
+                <h3>YouTube Data API v3</h3>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua chave aqui">
+                    <small>Obtenha em: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></small>
                 </div>
             </div>
 
-            <div class="radar-container">
-                <div class="radar-input-section">
-                    <div class="form-group">
-                        <label>Título em Português (PT-BR)</label>
-                        <input type="text" id="radarTitlePT" class="input" placeholder="Ex: Como Ganhar Dinheiro Online em 2024">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Idioma de Busca</label>
-                            <select id="radarLanguage" class="input">
-                                <option value="en">Inglês (EN)</option>
-                                <option value="es">Espanhol (ES)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Tradução Automática</label>
-                            <input type="text" id="radarTitleTranslated" class="input" placeholder="Tradução automática aparecerá aqui..." readonly>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary btn-lg" id="btnBuscarRadar">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
-                        </svg>
-                        Buscar no YouTube
-                    </button>
-
-                    <div class="api-config-note">
-                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
-                        </svg>
-                        <span>Configure sua YouTube Data API Key nas <a href="#" data-page="configuracoes">Configurações</a></span>
-                    </div>
-                </div>
-
-                <div id="radarResults" class="radar-results"></div>
-            </div>
-        </div>
-
-        <!-- CONFIGURAÇÕES PAGE -->
-        <div class="page" id="configuracoes-page">
-            <div class="page-header">
-                <div>
-                    <h1>Configurações</h1>
-                    <p class="page-subtitle">Configure o sistema</p>
+            <div class="settings-section">
+                <h3>Google Gemini API</h3>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="password" id="geminiApiKey" class="input" placeholder="Cole sua chave Gemini aqui">
+                    <small>Obtenha em: <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
                 </div>
             </div>
 
-            <div class="settings-container">
-                <div class="settings-section">
-                    <h3>YouTube Data API</h3>
-                    <div class="form-group">
-                        <label>API Key</label>
-                        <div class="api-key-input-group">
-                            <input type="password" id="youtubeApiKey" class="input" placeholder="Cole sua YouTube Data API Key aqui">
-                            <button class="btn-toggle-visibility" id="btnToggleApiKey">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <small>Obtenha sua chave em: <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></small>
-                    </div>
-                    <button class="btn btn-primary" id="btnSaveApiKey">
-                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
-                        </svg>
-                        Salvar API Key
-                    </button>
-                </div>
-
-                <div class="settings-section">
-                    <h3>Dados do Sistema</h3>
-                    <div class="settings-actions">
-                        <button class="btn btn-secondary" onclick="exportData()">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
-                            </svg>
-                            Exportar Backup
-                        </button>
-                        <button class="btn btn-danger" id="btnLimparDados">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
-                            </svg>
-                            Limpar Todos os Dados
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <button class="btn btn-primary" id="btnSaveConfig">Salvar Configurações</button>
         </div>
     </main>
 
-    <!-- MODAL SIMPLES: CRIAR/EDITAR VÍDEO -->
-    <div class="modal" id="videoModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-dialog">
-            <div class="modal-header">
-                <h2 id="modalTitle">Novo Vídeo</h2>
-                <button class="btn-close" id="btnCloseModal">
-                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                    </svg>
-                </button>
+    <!-- BOTTOM BAR (Mobile) -->
+    <nav class="bottom-bar" id="bottomBar">
+        <button class="bottom-item active" data-page="dashboard">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+            </svg>
+            <span>Home</span>
+        </button>
+        <button class="bottom-item" data-page="hunter">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+            </svg>
+            <span>Hunter</span>
+        </button>
+        <button class="bottom-item" id="btnBottomAdd">
+            <div class="bottom-fab">
+                <svg width="28" height="28" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                </svg>
             </div>
+            <span>Novo</span>
+        </button>
+        <button class="bottom-item" data-page="config">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"/>
+            </svg>
+            <span>Config</span>
+        </button>
+        <button class="bottom-item" id="btnBottomMenu">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+            </svg>
+            <span>Canais</span>
+        </button>
+    </nav>
 
+    <!-- MODAL: CRIAR CANAL -->
+    <div class="modal" id="channelModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog modal-sm">
+            <div class="modal-header">
+                <h2>Criar Canal</h2>
+                <button class="btn-close" id="btnCloseChannelModal">×</button>
+            </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Título do Vídeo *</label>
-                    <input type="text" id="videoTitle" class="input" placeholder="Título do Vídeo" required>
+                    <label>Nome do Canal</label>
+                    <input type="text" id="channelName" class="input" placeholder="Ex: Curiosidades, Tech News..." autofocus>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnCancelChannelModal">Cancelar</button>
+                <button class="btn btn-primary" id="btnSaveChannel">Criar</button>
+            </div>
+        </div>
+    </div>
 
-                <!-- THUMBNAIL UPLOAD -->
-                <div class="form-group">
-                    <label>Thumbnail do Vídeo</label>
-                    <div class="thumbnail-upload-area" id="thumbnailUploadArea">
-                        <input type="file" id="thumbnailInput" accept="image/*" style="display: none;">
-                        <div class="thumbnail-preview" id="thumbnailPreview" style="display: none;">
-                            <img id="thumbnailImage" src="" alt="Preview">
-                            <button type="button" class="btn-remove-thumbnail" id="btnRemoveThumbnail">
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                                </svg>
-                            </button>
+    <!-- SUPER MODAL: EDITAR VÍDEO (Focus Mode) -->
+    <div class="modal modal-fullscreen" id="videoModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog modal-focus">
+            <div class="modal-header">
+                <h2 id="modalTitle">Editar Vídeo</h2>
+                <div class="modal-actions">
+                    <button class="btn btn-danger-ghost" id="btnDeleteVideo" style="display: none;">Excluir</button>
+                    <button class="btn-close" id="btnCloseModal">×</button>
+                </div>
+            </div>
+
+            <div class="modal-body modal-scroll">
+                <div class="focus-grid">
+                    <!-- COLUNA 1: CONTEÚDO & ROTEIRO -->
+                    <div class="focus-section">
+                        <h3 class="focus-title">📝 Conteúdo & Roteiro</h3>
+
+                        <div class="form-group">
+                            <label>Título do Vídeo</label>
+                            <input type="text" id="videoTitle" class="input" placeholder="Como Ganhar $10K com YouTube em 2025">
                         </div>
-                        <div class="thumbnail-dropzone" id="thumbnailDropzone">
-                            <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor" style="opacity: 0.4; margin-bottom: 0.5rem;">
-                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
-                            </svg>
-                            <p style="color: var(--slate-300); font-size: 0.9375rem; margin-bottom: 0.25rem;">Arraste uma imagem ou clique para selecionar</p>
-                            <p style="color: var(--slate-500); font-size: 0.8125rem;">PNG, JPG até 5MB</p>
+
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="videoDescription" class="textarea" rows="3" placeholder="Descrição do vídeo para o YouTube..."></textarea>
+                        </div>
+
+                        <!-- Otimizador de Título (Gemini) -->
+                        <div class="ai-optimizer">
+                            <button class="btn btn-ai" id="btnOptimizeTitle">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"/>
+                                </svg>
+                                Otimizar Título com IA
+                            </button>
+                            <div id="titleOptimization" class="ai-result" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="label-with-counter">
+                                <label>Roteiro Completo</label>
+                                <div class="script-stats">
+                                    <span id="scriptWordCount">0 palavras</span>
+                                    <span id="scriptDuration">~0min</span>
+                                </div>
+                            </div>
+                            <textarea id="videoScript" class="textarea textarea-script" rows="15" placeholder="Escreva o roteiro completo do vídeo aqui..."></textarea>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label>Descrição do Vídeo</label>
-                    <textarea id="videoDescription" class="textarea" rows="3" placeholder="Descrição que será usada no YouTube"></textarea>
-                </div>
+                    <!-- COLUNA 2: MÍDIA & ANÁLISE -->
+                    <div class="focus-section">
+                        <h3 class="focus-title">🎨 Gestão de Mídia</h3>
 
-                <div class="form-group">
-                    <label>Roteiro Completo</label>
-                    <textarea id="videoScript" class="textarea" rows="10" placeholder="Escreva o roteiro do vídeo aqui..." style="font-family: 'Monaco', 'Menlo', 'Consolas', monospace; font-size: 0.875rem;"></textarea>
-                    <button type="button" class="btn btn-secondary" id="btnCopyScript" style="margin-top: 0.5rem;">
-                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
-                        </svg>
-                        Copiar Roteiro
-                    </button>
+                        <!-- Thumbnail Upload -->
+                        <div class="form-group">
+                            <label>Thumbnail</label>
+                            <div class="thumb-upload" id="thumbUploadArea">
+                                <input type="file" id="thumbInput" accept="image/*" style="display: none;">
+                                <div class="thumb-preview" id="thumbPreview" style="display: none;">
+                                    <img id="thumbImage" src="" alt="Thumbnail">
+                                    <button type="button" class="thumb-remove" id="btnRemoveThumb">×</button>
+                                </div>
+                                <div class="thumb-dropzone" id="thumbDropzone">
+                                    <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                                    </svg>
+                                    <p>Arraste ou clique para fazer upload</p>
+                                    <small>PNG, JPG até 5MB</small>
+                                </div>
+                            </div>
+
+                            <!-- Analisador de Thumb (Gemini Vision) -->
+                            <button class="btn btn-ai" id="btnAnalyzeThumb" style="margin-top: 0.75rem; display: none;">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                Analisar Thumbnail com IA
+                            </button>
+                            <div id="thumbAnalysis" class="ai-result" style="display: none;"></div>
+                        </div>
+
+                        <!-- Audio Upload -->
+                        <div class="form-group">
+                            <label>Arquivo de Áudio (Narração)</label>
+                            <input type="file" id="audioInput" accept="audio/*" class="file-input">
+                            <div id="audioPlayerContainer" style="display: none; margin-top: 0.75rem;">
+                                <audio id="audioPlayer" controls style="width: 100%;"></audio>
+                            </div>
+                        </div>
+
+                        <!-- Checklist de Workflow -->
+                        <div class="workflow-checklist">
+                            <h4>Checklist de Produção</h4>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="checkScript">
+                                <span>📝 Roteiro Completo</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="checkAudio">
+                                <span>🎙️ Áudio Gravado</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="checkThumb">
+                                <span>📷 Thumbnail Criada</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="checkRender">
+                                <span>✂️ Vídeo Renderizado</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
-                <button class="btn btn-danger" id="btnDeleteVideo" style="display: none;">Excluir</button>
-                <button class="btn btn-primary" id="btnSaveVideo">Salvar</button>
+                <button class="btn btn-success" id="btnSaveVideo">Salvar Vídeo</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: CRIAR CANAL -->
-    <div class="modal" id="channelModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-dialog" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>Criar Novo Canal</h2>
-                <button class="btn-close" id="btnCloseChannelModal">
-                    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Nome do Canal *</label>
-                    <input type="text" id="channelName" class="input" placeholder="Ex: Curiosidades, Tech News, Gameplays..." required autofocus>
-                    <small style="color: var(--slate-400); display: block; margin-top: 0.5rem;">Este será o nome do seu canal de vídeos.</small>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="btnCancelChannelModal">Cancelar</button>
-                <button class="btn btn-primary" id="btnSaveChannel">Criar Canal</button>
-            </div>
+    <!-- LEVEL UP CELEBRATION -->
+    <div class="level-up-toast" id="levelUpToast" style="display: none;">
+        <div class="level-up-content">
+            <div class="level-up-icon">🎉</div>
+            <h3 id="levelUpTitle">Subiu de Nível!</h3>
+            <p id="levelUpMessage">Você alcançou o nível Producer!</p>
         </div>
     </div>
 
