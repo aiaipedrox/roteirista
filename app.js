@@ -917,6 +917,24 @@ class UIManager {
             if (el) el.textContent = value;
         });
 
+        // Show/hide "Novo Vídeo" button based on selected channel
+        const btnNovoVideo = document.getElementById('btnNovoVideo');
+        const dashboardTitle = document.getElementById('dashboardTitle');
+        const dashboardSubtitle = document.getElementById('dashboardSubtitle');
+
+        if (this.selectedChannel) {
+            const channel = this.dataManager.getChannel(this.selectedChannel);
+            if (channel) {
+                if (btnNovoVideo) btnNovoVideo.style.display = 'inline-flex';
+                if (dashboardTitle) dashboardTitle.textContent = `📺 ${channel.name}`;
+                if (dashboardSubtitle) dashboardSubtitle.textContent = 'Gerencie os vídeos deste canal';
+            }
+        } else {
+            if (btnNovoVideo) btnNovoVideo.style.display = 'none';
+            if (dashboardTitle) dashboardTitle.textContent = 'Dashboard';
+            if (dashboardSubtitle) dashboardSubtitle.textContent = 'Selecione um canal para começar';
+        }
+
         this.renderVideos();
     }
 
@@ -935,12 +953,37 @@ class UIManager {
         if (count) count.textContent = `${videos.length} ${videos.length === 1 ? 'vídeo' : 'vídeos'}`;
 
         if (videos.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🎬</div>
-                    <p>Nenhum vídeo ainda.<br>Clique no + para começar!</p>
-                </div>
-            `;
+            if (this.selectedChannel) {
+                // Tem canal selecionado mas sem vídeos - mostrar botão grande
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎬</div>
+                        <h3 style="color: var(--slate-200); margin-bottom: 0.5rem;">Canal sem vídeos</h3>
+                        <p style="margin-bottom: 2rem;">Comece criando seu primeiro vídeo para este canal!</p>
+                        <button class="btn btn-primary btn-lg" id="btnCriarPrimeiroVideo" style="font-size: 1.125rem;">
+                            <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                            </svg>
+                            Criar Primeiro Vídeo
+                        </button>
+                    </div>
+                `;
+                // Add listener to the button
+                setTimeout(() => {
+                    const btn = document.getElementById('btnCriarPrimeiroVideo');
+                    if (btn) {
+                        btn.addEventListener('click', () => this.openVideoModal());
+                    }
+                }, 0);
+            } else {
+                // Nenhum canal selecionado
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎬</div>
+                        <p>Nenhum vídeo ainda.<br>Selecione um canal na barra lateral ou crie um novo!</p>
+                    </div>
+                `;
+            }
             return;
         }
 

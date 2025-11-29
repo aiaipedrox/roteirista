@@ -133,15 +133,33 @@ body {
    ========================================== */
 .sidebar {
     position: fixed;
-    left: 0;
+    left: -100%;
     top: var(--gamification-bar-height);
     width: var(--sidebar-width);
     height: calc(100vh - var(--gamification-bar-height));
     background: var(--slate-800);
     border-right: 1px solid var(--slate-700);
     overflow-y: auto;
-    z-index: 90;
-    display: none;
+    z-index: 100;
+    transition: left 0.3s ease;
+}
+
+.sidebar.mobile-open {
+    left: 0;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Backdrop when sidebar is open on mobile */
+body.sidebar-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 99;
+    backdrop-filter: blur(2px);
 }
 
 .sidebar-header {
