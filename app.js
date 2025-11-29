@@ -1329,11 +1329,19 @@ class UIManager {
        ========================================== */
     setupAudioUpload() {
         const input = document.getElementById('audioInput');
+        const btnRemoveAudio = document.getElementById('btnRemoveAudio');
 
         if (input) {
             input.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) this.handleAudioFile(file);
+            });
+        }
+
+        if (btnRemoveAudio) {
+            btnRemoveAudio.addEventListener('click', () => {
+                this.clearAudio();
+                this.showToast('Áudio removido', 'success');
             });
         }
     }
@@ -1345,15 +1353,32 @@ class UIManager {
             return;
         }
 
-        if (!file.type.startsWith('audio/')) {
-            this.showToast('Arquivo deve ser um áudio', 'error');
+        // Aceitar formatos específicos de áudio
+        const validTypes = [
+            'audio/mpeg',        // MP3
+            'audio/mp3',         // MP3 (alternativo)
+            'audio/wav',         // WAV
+            'audio/wave',        // WAV (alternativo)
+            'audio/x-wav',       // WAV (alternativo)
+            'audio/x-m4a',       // M4A
+            'audio/mp4',         // M4A (alternativo)
+            'audio/ogg',         // OGG
+            'audio/aac',         // AAC
+            'audio/x-aac'        // AAC (alternativo)
+        ];
+
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const validExtensions = ['mp3', 'wav', 'm4a', 'ogg', 'aac'];
+
+        if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+            this.showToast('Formato não suportado! Use: MP3, WAV, M4A, OGG ou AAC', 'error');
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (e) => {
             this.displayAudioPlayer(e.target.result);
-            this.showToast('Áudio carregado!', 'success');
+            this.showToast(`Áudio carregado! (${file.name})`, 'success');
         };
         reader.onerror = () => {
             this.showToast('Erro ao carregar áudio', 'error');
@@ -1363,21 +1388,30 @@ class UIManager {
 
     displayAudioPlayer(base64) {
         const player = document.getElementById('audioPlayer');
+        const container = document.getElementById('audioPlayerContainer');
+
         if (player) {
             player.src = base64;
-            player.style.display = 'block';
+        }
+        if (container) {
+            container.style.display = 'block';
         }
     }
 
     clearAudio() {
         const player = document.getElementById('audioPlayer');
+        const container = document.getElementById('audioPlayerContainer');
         const input = document.getElementById('audioInput');
 
         if (player) {
             player.src = '';
-            player.style.display = 'none';
         }
-        if (input) input.value = '';
+        if (container) {
+            container.style.display = 'none';
+        }
+        if (input) {
+            input.value = '';
+        }
     }
 
     /* ==========================================
