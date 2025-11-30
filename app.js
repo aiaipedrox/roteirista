@@ -1272,6 +1272,9 @@ class UIManager {
         if (btnDelete) btnDelete.addEventListener('click', () => this.deleteVideo());
         if (btnCopyScript) btnCopyScript.addEventListener('click', () => this.copyScript());
 
+        const btnConvertSRT = document.getElementById('btnConvertSRT');
+        if (btnConvertSRT) btnConvertSRT.addEventListener('click', () => this.convertScriptToSRT());
+
         // Script word count & duration
         const scriptInput = document.getElementById('videoScript');
         if (scriptInput) {
@@ -1414,6 +1417,58 @@ class UIManager {
         }).catch(() => {
             this.showToast('Erro ao copiar', 'error');
         });
+    }
+
+    convertScriptToSRT() {
+        const script = document.getElementById('videoScript')?.value.trim();
+        if (!script) {
+            this.showToast('Roteiro vazio', 'error');
+            return;
+        }
+
+        const videoTitle = document.getElementById('videoTitle')?.value.trim() || 'roteiro';
+
+        // Divide o roteiro em linhas/parágrafos
+        const lines = script.split('\n').filter(line => line.trim().length > 0);
+
+        // Configurações para geração do SRT
+        const secondsPerLine = 5; // Cada linha dura aproximadamente 5 segundos
+        let srtContent = '';
+        let currentTime = 0;
+
+        lines.forEach((line, index) => {
+            const sequenceNumber = index + 1;
+            const startTime = this.formatSRTTime(currentTime);
+            const endTime = this.formatSRTTime(currentTime + secondsPerLine);
+
+            srtContent += `${sequenceNumber}\n`;
+            srtContent += `${startTime} --> ${endTime}\n`;
+            srtContent += `${line.trim()}\n\n`;
+
+            currentTime += secondsPerLine;
+        });
+
+        // Criar e baixar arquivo SRT
+        const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${videoTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.srt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showToast('Arquivo SRT baixado!', 'success');
+    }
+
+    formatSRTTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        const ms = Math.floor((seconds % 1) * 1000);
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(ms).padStart(3, '0')}`;
     }
 
     /* ==========================================
