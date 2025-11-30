@@ -352,6 +352,26 @@
                 <button class="btn-close" id="btnCloseChannelModal">×</button>
             </div>
             <div class="modal-body">
+                <!-- Avatar Upload -->
+                <div class="form-group">
+                    <label>Avatar do Canal (Opcional)</label>
+                    <div class="avatar-upload-container">
+                        <div class="avatar-preview" id="channelAvatarPreview">
+                            <div class="avatar-placeholder" id="channelAvatarPlaceholder">📺</div>
+                            <img id="channelAvatarImage" style="display: none;" alt="Avatar">
+                        </div>
+                        <div class="avatar-upload-actions">
+                            <input type="file" id="channelAvatarInput" accept="image/*" style="display: none;">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnSelectAvatar">
+                                Escolher Imagem
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnRemoveAvatar" style="display: none;">
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Nome do Canal</label>
                     <input type="text" id="channelName" class="input" placeholder="Ex: Curiosidades, Tech News..." autofocus>

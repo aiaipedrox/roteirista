@@ -44,11 +44,11 @@ class DataManager {
     }
 
     // Channel CRUD
-    addChannel(name, thumbnail = '') {
+    addChannel(name, avatar = '') {
         const channel = {
             id: Date.now().toString(),
             name: name.trim(),
-            thumbnail: thumbnail,
+            avatar: avatar,
             createdAt: new Date().toISOString()
         };
         this.channels.push(channel);
@@ -791,6 +791,91 @@ class UIManager {
                 }
             });
         }
+
+        // Avatar upload
+        const btnSelectAvatar = document.getElementById('btnSelectAvatar');
+        const btnRemoveAvatar = document.getElementById('btnRemoveAvatar');
+        const avatarInput = document.getElementById('channelAvatarInput');
+
+        if (btnSelectAvatar) {
+            btnSelectAvatar.addEventListener('click', () => {
+                avatarInput?.click();
+            });
+        }
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) this.handleChannelAvatar(file);
+            });
+        }
+
+        if (btnRemoveAvatar) {
+            btnRemoveAvatar.addEventListener('click', () => {
+                this.clearChannelAvatar();
+            });
+        }
+    }
+
+    handleChannelAvatar(file) {
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        if (file.size > maxSize) {
+            this.showToast('Imagem muito grande! Max: 2MB', 'error');
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            this.showToast('Arquivo deve ser uma imagem', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.displayChannelAvatar(e.target.result);
+            this.showToast('Avatar carregado!', 'success');
+        };
+        reader.onerror = () => {
+            this.showToast('Erro ao carregar imagem', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    displayChannelAvatar(base64) {
+        const img = document.getElementById('channelAvatarImage');
+        const placeholder = document.getElementById('channelAvatarPlaceholder');
+        const btnRemove = document.getElementById('btnRemoveAvatar');
+
+        if (img) {
+            img.src = base64;
+            img.style.display = 'block';
+        }
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+        if (btnRemove) {
+            btnRemove.style.display = 'inline-flex';
+        }
+    }
+
+    clearChannelAvatar() {
+        const img = document.getElementById('channelAvatarImage');
+        const placeholder = document.getElementById('channelAvatarPlaceholder');
+        const btnRemove = document.getElementById('btnRemoveAvatar');
+        const input = document.getElementById('channelAvatarInput');
+
+        if (img) {
+            img.src = '';
+            img.style.display = 'none';
+        }
+        if (placeholder) {
+            placeholder.style.display = 'block';
+        }
+        if (btnRemove) {
+            btnRemove.style.display = 'none';
+        }
+        if (input) {
+            input.value = '';
+        }
     }
 
     openChannelModal() {
@@ -798,6 +883,8 @@ class UIManager {
         const input = document.getElementById('channelName');
 
         if (input) input.value = '';
+        this.clearChannelAvatar();
+
         if (modal) {
             modal.classList.add('active');
             setTimeout(() => input?.focus(), 100);
@@ -817,14 +904,22 @@ class UIManager {
             return;
         }
 
-        const channel = this.dataManager.addChannel(name);
+        // Get avatar if uploaded
+        const avatarImg = document.getElementById('channelAvatarImage');
+        const avatar = avatarImg && avatarImg.src && avatarImg.src.startsWith('data:')
+            ? avatarImg.src
+            : '';
+
+        const channel = this.dataManager.addChannel(name, avatar);
         this.showToast(`Canal "${name}" criado!`, 'success');
         this.closeChannelModal();
         this.renderChannelsList();
 
-        // Update canais page if we're on it
+        // Update pages
         if (this.currentPage === 'canais') {
             this.renderCanaisPage();
+        } else if (this.currentPage === 'home') {
+            this.renderHomeChannels();
         }
 
         this.selectChannel(channel.id);
@@ -935,11 +1030,16 @@ class UIManager {
             const totalVideos = videos.length;
             const postedVideos = videos.filter(v => v.stage === 'postado').length;
 
+            const avatarContent = channel.avatar
+                ? `<img src="${channel.avatar}" alt="${this.escapeHtml(channel.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:0.75rem;">`
+                : '<span style="margin-right:0.75rem;">📺</span>';
+
             return `
                 <div class="canal-card ${this.selectedChannel === channel.id ? 'active' : ''}" data-channel-id="${channel.id}">
                     <div class="canal-card-header">
-                        <div class="canal-card-name">
-                            📺 ${this.escapeHtml(channel.name)}
+                        <div class="canal-card-name" style="display:flex;align-items:center;">
+                            ${avatarContent}
+                            ${this.escapeHtml(channel.name)}
                         </div>
                         <button class="btn-icon btn-delete-channel" data-channel-id="${channel.id}" title="Excluir canal">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
