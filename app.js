@@ -534,7 +534,7 @@ class UIManager {
         this.setupSettings();
         this.renderChannelsList();
         this.gamificationManager.updateBadge();
-        this.navigateTo('dashboard');
+        this.navigateTo('home');
     }
 
     setupServices() {
@@ -647,6 +647,9 @@ class UIManager {
 
     renderCurrentPage() {
         switch (this.currentPage) {
+            case 'home':
+                this.renderHome();
+                break;
             case 'dashboard':
                 this.renderDashboard();
                 break;
@@ -660,6 +663,83 @@ class UIManager {
                 this.renderSettings();
                 break;
         }
+    }
+
+    /* ==========================================
+       HOME PAGE
+       ========================================== */
+    renderHome() {
+        // Render channels grid on home
+        this.renderHomeChannels();
+
+        // Render production metrics
+        const metrics = this.dataManager.getMetrics();
+        document.getElementById('homePlanning').textContent = metrics.planejamento;
+        document.getElementById('homeProduction').textContent = metrics.producao;
+        document.getElementById('homeReady').textContent = metrics.finalizado;
+        document.getElementById('homePosted').textContent = metrics.postado;
+
+        // Setup quick actions
+        document.querySelectorAll('.quick-action-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const page = card.dataset.nav;
+                if (page) this.navigateTo(page);
+            });
+        });
+
+        // Setup home create channel button
+        const btnHomeCriarCanal = document.getElementById('btnHomeCriarCanal');
+        if (btnHomeCriarCanal) {
+            btnHomeCriarCanal.replaceWith(btnHomeCriarCanal.cloneNode(true));
+            const newBtn = document.getElementById('btnHomeCriarCanal');
+            newBtn.addEventListener('click', () => this.openChannelModal());
+        }
+    }
+
+    renderHomeChannels() {
+        const container = document.getElementById('homeChannelsGrid');
+        if (!container) return;
+
+        const channels = this.dataManager.channels;
+
+        if (channels.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">📺</div>
+                    <p>Nenhum canal criado ainda.<br>Comece criando seu primeiro canal!</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = channels.map(channel => {
+            const videos = this.dataManager.getChannelVideos(channel.id);
+            const totalVideos = videos.length;
+            const postedVideos = videos.filter(v => v.stage === 'postado').length;
+
+            const avatarContent = channel.avatar
+                ? `<img src="${channel.avatar}" alt="${this.escapeHtml(channel.name)}">`
+                : '📺';
+
+            return `
+                <div class="home-channel-card" data-channel-id="${channel.id}">
+                    <div class="home-channel-avatar">
+                        ${avatarContent}
+                    </div>
+                    <div class="home-channel-info">
+                        <div class="home-channel-name">${this.escapeHtml(channel.name)}</div>
+                        <div class="home-channel-stats">${totalVideos} vídeos • ${postedVideos} postados</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click listeners
+        container.querySelectorAll('.home-channel-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.selectChannel(card.dataset.channelId);
+            });
+        });
     }
 
     /* ==========================================
